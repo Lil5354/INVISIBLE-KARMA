@@ -24,6 +24,12 @@ public class StreetLamp : MonoBehaviour
     [Header("Tự động thắp sáng")]
     public bool autoLightOnStart = false; // Tự động sáng khi bắt đầu (nếu false, player phải thắp)
     
+    [Header("Sạc Dầu cho Đèn Lồng")]
+    public bool canRefillOil = true; // Cho phép sạc dầu khi đèn đã bật
+    public float oilRefillAmount = 50f; // Số dầu được sạc mỗi lần (0-100)
+    public float refillCooldown = 5f; // Thời gian chờ giữa các lần sạc (giây)
+    private float lastRefillTime = -999f; // Thời gian sạc lần cuối
+    
     private void Start()
     {
         // Đặt trạng thái ban đầu
@@ -37,6 +43,17 @@ public class StreetLamp : MonoBehaviour
         if (lampLight == null)
         {
             lampLight = GetComponentInChildren<Light>();
+        }
+        
+        // Tự động tìm Particle System nếu chưa gán
+        if (fireParticle == null)
+        {
+            ParticleSystem[] particles = GetComponentsInChildren<ParticleSystem>();
+            if (particles.Length > 0)
+            {
+                fireParticle = particles[0].gameObject;
+                Debug.Log($"[StreetLamp] Đã tự động tìm thấy Particle System: {fireParticle.name}");
+            }
         }
         
         // Tự động tạo Safe Zone Trigger nếu chưa có
@@ -65,6 +82,7 @@ public class StreetLamp : MonoBehaviour
     
     /// <summary>
     /// Hàm này sẽ được gọi từ Player khi nhấn E
+    /// Chỉ bật/tắt đèn, không sạc dầu
     /// </summary>
     public void ToggleLamp()
     {
@@ -104,6 +122,125 @@ public class StreetLamp : MonoBehaviour
         }
         
         Debug.Log($"[StreetLamp] {gameObject.name}: Đèn {(isOn ? "đã được bật" : "đã được tắt")}!");
+    }
+    
+    /// <summary>
+    /// Kiểm tra xem có thể sạc dầu không
+    /// </summary>
+    bool CanRefillOil()
+    {
+        // Kiểm tra cooldown
+        if (Time.time - lastRefillTime < refillCooldown)
+        {
+            float remainingTime = refillCooldown - (Time.time - lastRefillTime);
+            Debug.Log($"[StreetLamp] CanRefillOil: Đang trong cooldown! Còn {remainingTime:F1} giây");
+            return false;
+        }
+        
+        // Tìm Player và LanternSystem
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null)
+        {
+            Debug.LogWarning("[StreetLamp] CanRefillOil: Không tìm thấy Player! Hãy đảm bảo Player có Tag 'Player'.");
+            return false;
+        }
+        
+        LanternSystem lantern = player.GetComponent<LanternSystem>();
+        if (lantern == null)
+        {
+            Debug.LogWarning("[StreetLamp] CanRefillOil: Player không có LanternSystem component!");
+            return false;
+        }
+        
+        // Kiểm tra xem dầu đã đầy chưa
+        if (lantern.currentOil >= lantern.maxOil)
+        {
+            Debug.Log($"[StreetLamp] CanRefillOil: Dầu đã đầy! ({lantern.currentOil:F1}/{lantern.maxOil})");
+            return false;
+        }
+        
+        Debug.Log($"[StreetLamp] CanRefillOil: ✅ CÓ THỂ SẠC! Dầu hiện tại: {lantern.currentOil:F1}/{lantern.maxOil}");
+        return true;
+    }
+    
+    /// <summary>
+    /// Sạc dầu cho đèn lồng của player
+    /// </summary>
+    public void RefillPlayerOil()
+    {
+        // Kiểm tra cooldown
+        if (Time.time - lastRefillTime < refillCooldown)
+        {
+            float remainingTime = refillCooldown - (Time.time - lastRefillTime);
+            Debug.LogWarning($"[StreetLamp] RefillPlayerOil: Phải đợi {remainingTime:F1} giây nữa mới sạc được!");
+            return;
+        }
+        
+        // Tìm Player và LanternSystem
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null)
+        {
+            Debug.LogError("[StreetLamp] RefillPlayerOil: Không tìm thấy Player! Hãy đảm bảo Player có Tag 'Player'.");
+            return;
+        }
+        
+        // Kiểm tra xem có bao nhiêu LanternSystem component
+        LanternSystem[] allLanterns = player.GetComponents<LanternSystem>();
+        if (allLanterns.Length > 1)
+        {
+            Debug.LogWarning($"[StreetLamp] RefillPlayerOil: CẢNH BÁO! Có {allLanterns.Length} LanternSystem component trên Player! Sẽ dùng component đầu tiên.");
+            for (int i = 0; i < allLanterns.Length; i++)
+            {
+                Debug.LogWarning($"[StreetLamp] LanternSystem #{i}: Instance ID = {allLanterns[i].GetInstanceID()}, currentOil = {allLanterns[i].currentOil:F1}");
+            }
+        }
+        
+        LanternSystem lantern = player.GetComponent<LanternSystem>();
+        if (lantern == null)
+        {
+            Debug.LogError("[StreetLamp] RefillPlayerOil: Player không có LanternSystem component!");
+            return;
+        }
+        
+        Debug.Log($"[StreetLamp] RefillPlayerOil: Đã tìm thấy LanternSystem - Instance ID: {lantern.GetInstanceID()}, GameObject: {lantern.gameObject.name}");
+        
+        // Kiểm tra xem dầu đã đầy chưa
+        if (lantern.currentOil >= lantern.maxOil)
+        {
+            Debug.Log($"[StreetLamp] RefillPlayerOil: Đèn lồng đã đầy dầu rồi! ({lantern.currentOil:F1}/{lantern.maxOil})");
+            return;
+        }
+        
+        // Sạc dầu
+        float oldOil = lantern.currentOil;
+        lantern.AddOil(oilRefillAmount);
+        lastRefillTime = Time.time;
+        
+        // ĐỌC LẠI GIÁ TRỊ SAU KHI SẠC để đảm bảo đã cập nhật
+        float newOil = lantern.currentOil;
+        
+        Debug.Log($"[StreetLamp] ✅ ĐÃ SẠC DẦU! {oldOil:F1} → {newOil:F1}/{lantern.maxOil} (+{oilRefillAmount})");
+        
+        // Kiểm tra xem có cập nhật đúng không
+        float expectedOil = Mathf.Clamp(oldOil + oilRefillAmount, 0f, lantern.maxOil);
+        if (Mathf.Abs(newOil - expectedOil) > 0.1f)
+        {
+            Debug.LogWarning($"[StreetLamp] ⚠️ CẢNH BÁO: Dầu không được cập nhật đúng! Mong đợi: {expectedOil:F1}, Thực tế: {newOil:F1}");
+            Debug.LogWarning($"[StreetLamp] Đang thử cập nhật lại...");
+            // Thử cập nhật lại
+            lantern.currentOil = expectedOil;
+            Debug.Log($"[StreetLamp] Đã cập nhật lại: {lantern.currentOil:F1}/{lantern.maxOil}");
+        }
+        else
+        {
+            Debug.Log($"[StreetLamp] ✅ Dầu đã được cập nhật đúng!");
+        }
+        
+        // Phát âm thanh nếu có
+        if (audioSource != null && lightOnSFX != null)
+        {
+            audioSource.PlayOneShot(lightOnSFX);
+        }
     }
     
     /// <summary>
@@ -164,6 +301,17 @@ public class StreetLamp : MonoBehaviour
         else
         {
             Debug.LogError($"[StreetLamp] {gameObject.name}: lampLight là NULL! Hãy gán Point Light vào field 'Lamp Light'.");
+        }
+        
+        // Tự động tìm Particle System nếu chưa gán
+        if (fireParticle == null)
+        {
+            ParticleSystem[] particles = GetComponentsInChildren<ParticleSystem>();
+            if (particles.Length > 0)
+            {
+                fireParticle = particles[0].gameObject;
+                Debug.Log($"[StreetLamp] Đã tự động tìm thấy Particle System: {fireParticle.name}");
+            }
         }
         
         if (fireParticle != null) 

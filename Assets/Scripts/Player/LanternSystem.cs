@@ -13,7 +13,16 @@ public class LanternSystem : MonoBehaviour
 
     [Header("Cài đặt Nhiên liệu")]
     public float maxOil = 100f;
-    public float currentOil;
+    [SerializeField] private float _currentOil = 100f; // Dùng property để tránh Inspector override
+    public float currentOil 
+    { 
+        get { return _currentOil; } 
+        set 
+        { 
+            _currentOil = Mathf.Clamp(value, 0f, maxOil);
+            Debug.Log($"[LanternSystem] currentOil được set: {value:F1} → {_currentOil:F1} (Instance: {GetInstanceID()})");
+        } 
+    }
     public float drainRate = 5f; // Tốn 5 dầu mỗi giây khi đèn bật
 
     [Header("Cài đặt Vùng An Toàn")]
@@ -26,7 +35,9 @@ public class LanternSystem : MonoBehaviour
 
     void Start()
     {
-        currentOil = maxOil;
+        Debug.Log($"[LanternSystem] Start() - Instance ID: {GetInstanceID()}, GameObject: {gameObject.name}");
+        _currentOil = maxOil;
+        Debug.Log($"[LanternSystem] Start() - currentOil được khởi tạo: {currentOil:F1}/{maxOil}");
         
         // Tự động tìm Light nếu chưa gán
         if (lanternLight == null)
@@ -159,9 +170,15 @@ public class LanternSystem : MonoBehaviour
         }
 
         // Logic tiêu hao dầu
-        if (isLanternOn && currentOil > 0)
+        if (isLanternOn && _currentOil > 0)
         {
-            currentOil -= drainRate * Time.deltaTime;
+            _currentOil -= drainRate * Time.deltaTime;
+            
+            // Đảm bảo currentOil không bị âm
+            if (_currentOil < 0)
+            {
+                _currentOil = 0;
+            }
             
             // Hiệu ứng đèn nhấp nháy khi sắp hết dầu (Dưới 20%)
             if (lanternLight != null && lanternLight.enabled)
@@ -176,19 +193,18 @@ public class LanternSystem : MonoBehaviour
                 }
             }
         }
-        else if (currentOil <= 0)
+        
+        // Kiểm tra hết dầu (chỉ khi đèn đang bật)
+        if (_currentOil <= 0 && isLanternOn)
         {
             // Hết dầu thì tắt ngóm
-            currentOil = 0;
-            if (isLanternOn)
+            _currentOil = 0;
+            isLanternOn = false;
+            if (lanternLight != null)
             {
-                isLanternOn = false;
-                if (lanternLight != null)
-                {
-                    lanternLight.enabled = false;
-                }
-                Debug.Log("Đèn đã hết dầu!");
+                lanternLight.enabled = false;
             }
+            Debug.Log("[LanternSystem] Đèn đã hết dầu và tự động tắt!");
         }
     }
 
@@ -208,9 +224,13 @@ public class LanternSystem : MonoBehaviour
             }
         }
         
-        if (currentOil <= 0)
+        // Kiểm tra dầu với debug log chi tiết
+        Debug.Log($"[LanternSystem] ToggleLantern() được gọi - Instance ID: {GetInstanceID()}, GameObject: {gameObject.name}");
+        Debug.Log($"[LanternSystem] ToggleLantern: currentOil = {_currentOil:F1}, maxOil = {maxOil}, isLanternOn = {isLanternOn}");
+        
+        if (_currentOil <= 0)
         {
-            Debug.Log("Không thể bật đèn: Hết dầu!");
+            Debug.LogWarning($"[LanternSystem] Không thể bật đèn: Hết dầu! (currentOil = {_currentOil:F1}, Instance: {GetInstanceID()})");
             return;
         }
 
@@ -223,11 +243,11 @@ public class LanternSystem : MonoBehaviour
             if (isLanternOn)
             {
                 lanternLight.intensity = normalIntensity;
-                Debug.Log($"Đèn đã được bật! Dầu còn lại: {currentOil:F1}/{maxOil}");
+                Debug.Log($"[LanternSystem] ✅ Đèn đã được bật! Dầu còn lại: {_currentOil:F1}/{maxOil} (Instance: {GetInstanceID()})");
             }
             else
             {
-                Debug.Log("Đèn đã được tắt!");
+                Debug.Log("[LanternSystem] Đèn đã được tắt!");
             }
         }
         else
@@ -237,12 +257,43 @@ public class LanternSystem : MonoBehaviour
     }
 
     /// <summary>
+    /// Sạc đầy dầu (wrapper method - gọi từ StreetLamp)
+    /// </summary>
+    public void RefillOil()
+    {
+        Debug.Log($"[LanternSystem] RefillOil() được gọi - Instance ID: {GetInstanceID()}");
+        float oldOil = _currentOil;
+        _currentOil = maxOil; // Đổ đầy 100%
+        
+        Debug.Log($"[LanternSystem] ✅ ĐÃ SẠC ĐẦY DẦU! {oldOil:F1} → {_currentOil:F1}/{maxOil} (Instance: {GetInstanceID()})");
+        
+        // KHÔNG tự động bật đèn - để player tự quyết định khi nào bật
+    }
+    
+    /// <summary>
     /// Thêm dầu vào đèn (khi nhặt được item dầu)
     /// </summary>
     public void AddOil(float amount)
     {
-        currentOil = Mathf.Clamp(currentOil + amount, 0f, maxOil);
-        Debug.Log($"Đã thêm {amount} dầu. Tổng: {currentOil}/{maxOil}");
+        Debug.Log($"[LanternSystem] AddOil() được gọi - Instance ID: {GetInstanceID()}, GameObject: {gameObject.name}");
+        float oldOil = _currentOil;
+        _currentOil = Mathf.Clamp(_currentOil + amount, 0f, maxOil);
+        
+        Debug.Log($"[LanternSystem] AddOil: {oldOil:F1} + {amount} = {_currentOil:F1}/{maxOil} (Instance: {GetInstanceID()})");
+        
+        // Đảm bảo currentOil không bị âm hoặc vượt quá maxOil
+        if (_currentOil < 0)
+        {
+            Debug.LogError($"[LanternSystem] AddOil: currentOil bị âm! ({_currentOil}) - Đang reset về 0");
+            _currentOil = 0;
+        }
+        if (_currentOil > maxOil)
+        {
+            Debug.LogWarning($"[LanternSystem] AddOil: currentOil vượt quá maxOil! ({_currentOil} > {maxOil}) - Đang clamp về {maxOil}");
+            _currentOil = maxOil;
+        }
+        
+        Debug.Log($"[LanternSystem] ✅ Dầu đã được cập nhật: {_currentOil:F1}/{maxOil} (Instance: {GetInstanceID()})");
     }
 
     /// <summary>
@@ -278,7 +329,7 @@ public class LanternSystem : MonoBehaviour
     /// </summary>
     public float GetOilPercentage()
     {
-        return currentOil / maxOil;
+        return _currentOil / maxOil;
     }
 
     /// <summary>
