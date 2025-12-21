@@ -13,12 +13,20 @@ public class GameController : MonoBehaviour
     public Text loseText; // (Tùy chọn) Kéo Text component vào nếu muốn đổi chữ
     public float loseDisplayTime = 2f; // Thời gian hiển thị "YOU LOSE" trước khi reload
     
+    [Header("Cài đặt Scene Thua")]
+    [Tooltip("Tên scene thua (scene có hình nhân giấy) - Để trống nếu muốn reload scene hiện tại")]
+    public string gameOverSceneName = ""; // Tên scene thua (để trống = reload scene hiện tại)
+    
+    [Tooltip("Chuyển sang scene thua thay vì reload scene hiện tại")]
+    public bool useGameOverScene = false;
+    
     [Header("Cài đặt Game")]
     public Vector3 playerStartPosition; // Vị trí bắt đầu của player (tự động lấy)
     public bool autoFindPlayerStart = true; // Tự động tìm vị trí player khi Start
     
     [Header("References")]
     public Transform player; // Reference đến Player
+    public StressManager stressManager; // Reference đến StressManager
     
     public static GameController instance; // Singleton để gọi từ bất cứ đâu
     
@@ -51,6 +59,16 @@ public class GameController : MonoBehaviour
             }
         }
         
+        // Tự động tìm StressManager nếu chưa gán
+        if (stressManager == null && player != null)
+        {
+            stressManager = player.GetComponent<StressManager>();
+            if (stressManager == null)
+            {
+                stressManager = player.GetComponentInChildren<StressManager>();
+            }
+        }
+        
         // Lưu vị trí bắt đầu của player
         if (autoFindPlayerStart && player != null)
         {
@@ -61,6 +79,55 @@ public class GameController : MonoBehaviour
         if (losePanel != null)
         {
             losePanel.SetActive(false);
+        }
+    }
+    
+    void Update()
+    {
+        // Tự động tìm StressManager nếu chưa có (mỗi frame để đảm bảo)
+        if (stressManager == null && player != null)
+        {
+            stressManager = player.GetComponent<StressManager>();
+            if (stressManager == null)
+            {
+                stressManager = player.GetComponentInChildren<StressManager>();
+            }
+            if (stressManager == null)
+            {
+                stressManager = FindObjectOfType<StressManager>();
+            }
+        }
+        
+        // Kiểm tra stress >= 100 → Game Over
+        if (!gameOver && !gameWon)
+        {
+            if (stressManager != null)
+            {
+                float currentStress = stressManager.GetStress();
+                
+                // Kiểm tra stress >= 100 (với tolerance nhỏ)
+                if (currentStress >= 99.9f)
+                {
+                    Debug.LogError($"[GameController] ⚠️ STRESS ĐẠT 100! ({currentStress:F1}/100) - TRIGGERING GAME OVER!");
+                    GameOver();
+                }
+                else if (currentStress >= 90f)
+                {
+                    // Debug log khi stress cao (chỉ log mỗi giây để tránh spam)
+                    if (Time.frameCount % 60 == 0) // Mỗi ~1 giây (60 FPS)
+                    {
+                        Debug.LogWarning($"[GameController] Stress cao: {currentStress:F1}/100");
+                    }
+                }
+            }
+            else
+            {
+                // Debug: Cảnh báo nếu không tìm thấy StressManager
+                if (Time.frameCount % 300 == 0) // Mỗi ~5 giây
+                {
+                    Debug.LogWarning("[GameController] Không tìm thấy StressManager! Hãy gắn StressManager vào Player.");
+                }
+            }
         }
     }
     
@@ -109,8 +176,61 @@ public class GameController : MonoBehaviour
         // Trả lại thời gian bình thường trước khi reload
         Time.timeScale = 1;
         
-        // Reload lại màn chơi hiện tại
-        ReloadScene();
+        // Chuyển sang scene thua hoặc reload scene hiện tại
+        if (useGameOverScene && !string.IsNullOrEmpty(gameOverSceneName))
+        {
+            LoadGameOverScene();
+        }
+        else
+        {
+            ReloadScene();
+        }
+    }
+    
+    /// <summary>
+    /// Chuyển sang scene thua (scene có hình nhân giấy)
+    /// </summary>
+    public void LoadGameOverScene()
+    {
+        if (string.IsNullOrEmpty(gameOverSceneName))
+        {
+            Debug.LogWarning("[GameController] Game Over Scene Name chưa được cấu hình! Sẽ reload scene hiện tại.");
+            ReloadScene();
+            return;
+        }
+        
+        // Mở khóa con trỏ chuột
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        
+        Debug.Log($"[GameController] 🚀 Đang chuyển sang scene thua: {gameOverSceneName}");
+        
+        // Kiểm tra scene có tồn tại không
+        bool sceneExists = false;
+        for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+        {
+            string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
+            string sceneName = System.IO.Path.GetFileNameWithoutExtension(scenePath);
+            if (sceneName == gameOverSceneName)
+            {
+                sceneExists = true;
+                Debug.Log($"[GameController] ✅ Tìm thấy scene '{gameOverSceneName}' trong Build Settings (Index: {i})");
+                break;
+            }
+        }
+        
+        if (!sceneExists)
+        {
+            Debug.LogError($"[GameController] ❌ KHÔNG TÌM THẤY SCENE '{gameOverSceneName}' TRONG BUILD SETTINGS!");
+            Debug.LogError($"[GameController] ❌ Vui lòng thêm scene '{gameOverSceneName}' vào File -> Build Settings -> Add Open Scenes");
+            Debug.LogError($"[GameController] ⚠️ Sẽ reload scene hiện tại thay vì chuyển scene thua.");
+            ReloadScene();
+            return;
+        }
+        
+        // Chuyển sang scene thua
+        SceneManager.LoadScene(gameOverSceneName);
+        Debug.Log($"[GameController] ✅ Đã chuyển sang scene thua: {gameOverSceneName}");
     }
     
     /// <summary>
@@ -141,10 +261,17 @@ public class GameController : MonoBehaviour
         }
         
         // Reset stress nếu có
-        StressManager stressMgr = player.GetComponent<StressManager>();
-        if (stressMgr != null)
+        if (stressManager == null)
         {
-            stressMgr.ResetStress();
+            stressManager = player.GetComponent<StressManager>();
+            if (stressManager == null)
+            {
+                stressManager = player.GetComponentInChildren<StressManager>();
+            }
+        }
+        if (stressManager != null)
+        {
+            stressManager.ResetStress();
         }
         
         // Reset đèn lồng nếu có

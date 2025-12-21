@@ -20,12 +20,20 @@ public class LanternSystemHelper : MonoBehaviour
     [SerializeField] private KeyCode debugKey = KeyCode.L;
     
     private LanternSystem lanternSystem;
+    private StressManager stressManager;
     
     void Start()
     {
         if (autoSetupOnStart)
         {
             SetupLanternSystem();
+        }
+        
+        // Tìm StressManager
+        stressManager = GetComponent<StressManager>();
+        if (stressManager == null)
+        {
+            stressManager = GetComponentInChildren<StressManager>();
         }
     }
     
@@ -144,10 +152,26 @@ public class LanternSystemHelper : MonoBehaviour
     {
         if (!showDebugInfo) return;
         
-        if (lanternSystem == null)
+        // Khai báo biến dùng chung
+        float yOffset = 10f;
+        float lineHeight = 20f;
+        
+        // LUÔN TÌM LẠI LanternSystem mỗi frame để đảm bảo đọc từ instance đúng
+        // (Tránh trường hợp có nhiều instance và đọc nhầm)
+        LanternSystem currentLantern = GetComponent<LanternSystem>();
+        if (currentLantern == null)
         {
-            lanternSystem = GetComponent<LanternSystem>();
+            currentLantern = GetComponentInChildren<LanternSystem>();
         }
+        
+        // Nếu vẫn không tìm thấy, dùng reference cũ (nếu có)
+        if (currentLantern == null)
+        {
+            currentLantern = lanternSystem;
+        }
+        
+        // Cập nhật reference
+        lanternSystem = currentLantern;
         
         if (lanternSystem != null)
         {
@@ -155,9 +179,6 @@ public class LanternSystemHelper : MonoBehaviour
             style.fontSize = 14;
             style.normal.textColor = Color.yellow;
             style.alignment = TextAnchor.UpperRight;
-            
-            float yOffset = 10f;
-            float lineHeight = 20f;
             
             GUI.Label(new Rect(Screen.width - 250, yOffset, 240, 20), 
                 "=== LANTERN SYSTEM ===", style);
@@ -169,15 +190,6 @@ public class LanternSystemHelper : MonoBehaviour
             GUI.Label(new Rect(Screen.width - 250, yOffset, 240, 20), 
                 $"Status: {(isOn ? "ON" : "OFF")}", style);
             style.normal.textColor = Color.yellow;
-            yOffset += lineHeight;
-            
-            GUI.Label(new Rect(Screen.width - 250, yOffset, 240, 20), 
-                $"Oil: {lanternSystem.currentOil:F1}/{lanternSystem.maxOil}", style);
-            yOffset += lineHeight;
-            
-            float oilPercent = lanternSystem.GetOilPercentage();
-            GUI.Label(new Rect(Screen.width - 250, yOffset, 240, 20), 
-                $"Oil: {oilPercent * 100:F1}%", style);
             yOffset += lineHeight;
             
             if (lanternSystem.lanternLight == null)
@@ -209,6 +221,94 @@ public class LanternSystemHelper : MonoBehaviour
             
             GUI.Label(new Rect(Screen.width - 250, yOffset, 240, 20), 
                 $"Press F to toggle | {debugKey} to debug", style);
+        }
+        
+        // Hiển thị STRESS SYSTEM
+        if (stressManager == null)
+        {
+            stressManager = GetComponent<StressManager>();
+            if (stressManager == null)
+            {
+                stressManager = GetComponentInChildren<StressManager>();
+            }
+            if (stressManager == null)
+            {
+                // Thử tìm trong scene
+                stressManager = FindObjectOfType<StressManager>();
+            }
+        }
+        
+        if (stressManager != null)
+        {
+            GUIStyle stressStyle = new GUIStyle(GUI.skin.label);
+            stressStyle.fontSize = 14;
+            stressStyle.alignment = TextAnchor.UpperRight;
+            
+            // Tính vị trí Y bắt đầu (dưới Lantern System)
+            float stressStartY = yOffset + lineHeight + 20f; // Cách Lantern System 20px
+            float stressCurrentY = stressStartY;
+            float stressLineHeight = 20f;
+            
+            // Title
+            stressStyle.normal.textColor = Color.red;
+            GUI.Label(new Rect(Screen.width - 250, stressCurrentY, 240, 20), 
+                "=== STRESS SYSTEM ===", stressStyle);
+            stressCurrentY += stressLineHeight;
+            
+            // Stress value
+            float currentStress = stressManager.GetStress();
+            float maxStress = 100f;
+            float stressPercent = stressManager.GetStressPercentage();
+            
+            // Màu sắc dựa trên mức stress
+            if (currentStress >= 80f)
+            {
+                stressStyle.normal.textColor = Color.red; // Rất nguy hiểm
+            }
+            else if (currentStress >= 50f)
+            {
+                stressStyle.normal.textColor = new Color(1f, 0.5f, 0f); // Cam - Cảnh báo
+            }
+            else if (currentStress >= 25f)
+            {
+                stressStyle.normal.textColor = Color.yellow; // Vàng - Cẩn thận
+            }
+            else
+            {
+                stressStyle.normal.textColor = Color.green; // Xanh - An toàn
+            }
+            
+            GUI.Label(new Rect(Screen.width - 250, stressCurrentY, 240, 20), 
+                $"Stress: {currentStress:F1}/{maxStress}", stressStyle);
+            stressCurrentY += stressLineHeight;
+            
+            GUI.Label(new Rect(Screen.width - 250, stressCurrentY, 240, 20), 
+                $"Stress: {stressPercent * 100:F1}%", stressStyle);
+            stressCurrentY += stressLineHeight;
+            
+            // Cảnh báo nếu stress cao
+            if (currentStress >= 80f)
+            {
+                stressStyle.normal.textColor = Color.red;
+                GUI.Label(new Rect(Screen.width - 250, stressCurrentY, 240, 20), 
+                    "⚠️ NGUY HIỂM!", stressStyle);
+            }
+            else if (currentStress >= 50f)
+            {
+                stressStyle.normal.textColor = new Color(1f, 0.5f, 0f);
+                GUI.Label(new Rect(Screen.width - 250, stressCurrentY, 240, 20), 
+                    "⚠️ CẢNH BÁO!", stressStyle);
+            }
+        }
+        else
+        {
+            // Debug: Hiển thị cảnh báo nếu không tìm thấy StressManager
+            GUIStyle warningStyle = new GUIStyle(GUI.skin.label);
+            warningStyle.fontSize = 12;
+            warningStyle.normal.textColor = Color.red;
+            warningStyle.alignment = TextAnchor.UpperRight;
+            GUI.Label(new Rect(Screen.width - 250, 150f, 240, 20), 
+                "⚠️ StressManager not found!", warningStyle);
         }
     }
 }

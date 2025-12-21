@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI; // Nếu bạn muốn làm thanh UI hiển thị dầu sau này
+using System; // Cho event
 
 /// <summary>
 /// Hệ thống đèn lồng gắn trên người player
@@ -7,6 +8,8 @@ using UnityEngine.UI; // Nếu bạn muốn làm thanh UI hiển thị dầu sau
 /// </summary>
 public class LanternSystem : MonoBehaviour
 {
+    // Event để thông báo khi dầu thay đổi (UI có thể subscribe để cập nhật)
+    public static event Action<float, float> OnOilChanged; // (currentOil, maxOil)
     [Header("Cài đặt Đèn")]
     public Light lanternLight; // Point Light gắn trên player
     public bool isLanternOn = false;
@@ -172,6 +175,7 @@ public class LanternSystem : MonoBehaviour
         // Logic tiêu hao dầu
         if (isLanternOn && _currentOil > 0)
         {
+            float oldOil = _currentOil;
             _currentOil -= drainRate * Time.deltaTime;
             
             // Đảm bảo currentOil không bị âm
@@ -180,12 +184,18 @@ public class LanternSystem : MonoBehaviour
                 _currentOil = 0;
             }
             
+            // Thông báo UI khi dầu giảm (mỗi 0.5 giây để tránh spam)
+            if (Time.frameCount % 30 == 0 && Mathf.Abs(oldOil - _currentOil) > 0.1f)
+            {
+                NotifyOilChanged();
+            }
+            
             // Hiệu ứng đèn nhấp nháy khi sắp hết dầu (Dưới 20%)
             if (lanternLight != null && lanternLight.enabled)
             {
                 if (currentOil < 20)
                 {
-                    lanternLight.intensity = Random.Range(lowOilIntensityMin, lowOilIntensityMax); // Nhấp nháy
+                    lanternLight.intensity = UnityEngine.Random.Range(lowOilIntensityMin, lowOilIntensityMax); // Nhấp nháy
                 }
                 else
                 {
@@ -267,6 +277,13 @@ public class LanternSystem : MonoBehaviour
         
         Debug.Log($"[LanternSystem] ✅ ĐÃ SẠC ĐẦY DẦU! {oldOil:F1} → {_currentOil:F1}/{maxOil} (Instance: {GetInstanceID()})");
         
+        // Force update UI bằng cách trigger property setter
+        currentOil = _currentOil; // Gán lại để trigger setter và đảm bảo UI được cập nhật
+        
+        // --- CẬP NHẬT UI NGAY LẬP TỨC (BẤT KỂ ĐÈN ĐANG TẮT HAY BẬT) ---
+        UpdateDebugUI(); // Gọi hàm này để force update UI ngay lập tức
+        // -------------------------------------------------------------------
+        
         // KHÔNG tự động bật đèn - để player tự quyết định khi nào bật
     }
     
@@ -277,11 +294,14 @@ public class LanternSystem : MonoBehaviour
     {
         Debug.Log($"[LanternSystem] AddOil() được gọi - Instance ID: {GetInstanceID()}, GameObject: {gameObject.name}");
         float oldOil = _currentOil;
-        _currentOil = Mathf.Clamp(_currentOil + amount, 0f, maxOil);
+        
+        // Tính toán giá trị mới
+        float newOilValue = _currentOil + amount;
+        _currentOil = Mathf.Clamp(newOilValue, 0f, maxOil);
         
         Debug.Log($"[LanternSystem] AddOil: {oldOil:F1} + {amount} = {_currentOil:F1}/{maxOil} (Instance: {GetInstanceID()})");
         
-        // Đảm bảo currentOil không bị âm hoặc vượt quá maxOil
+        // Đảm bảo currentOil không bị âm hoặc vượt quá maxOil (double check)
         if (_currentOil < 0)
         {
             Debug.LogError($"[LanternSystem] AddOil: currentOil bị âm! ({_currentOil}) - Đang reset về 0");
@@ -293,7 +313,44 @@ public class LanternSystem : MonoBehaviour
             _currentOil = maxOil;
         }
         
-        Debug.Log($"[LanternSystem] ✅ Dầu đã được cập nhật: {_currentOil:F1}/{maxOil} (Instance: {GetInstanceID()})");
+        // ĐỌC LẠI GIÁ TRỊ ĐỂ XÁC NHẬN
+        float confirmedOil = _currentOil;
+        Debug.Log($"[LanternSystem] ✅ Dầu đã được cập nhật: {confirmedOil:F1}/{maxOil} (Instance: {GetInstanceID()})");
+        Debug.Log($"[LanternSystem] 🔍 XÁC NHẬN: Property currentOil trả về: {currentOil:F1} (phải khớp với {confirmedOil:F1})");
+        
+        // Force update UI bằng cách trigger property setter (nếu có UI đang listen)
+        // Điều này đảm bảo UI được thông báo về thay đổi
+        float temp = currentOil; // Đọc property để trigger getter
+        currentOil = _currentOil; // Gán lại để trigger setter và log (nếu có)
+        
+        // --- CẬP NHẬT UI NGAY LẬP TỨC (BẤT KỂ ĐÈN ĐANG TẮT HAY BẬT) ---
+        UpdateDebugUI(); // Gọi hàm này để force update UI ngay lập tức
+        // -------------------------------------------------------------------
+    }
+    
+    /// <summary>
+    /// Thông báo cho UI khi dầu thay đổi (gọi event)
+    /// </summary>
+    void NotifyOilChanged()
+    {
+        // Trigger event để UI có thể cập nhật ngay lập tức
+        OnOilChanged?.Invoke(_currentOil, maxOil);
+        Debug.Log($"[LanternSystem] 🔔 Đã thông báo UI: Dầu = {_currentOil:F1}/{maxOil}");
+    }
+    
+    /// <summary>
+    /// Cập nhật UI ngay lập tức (có thể gọi từ bên ngoài)
+    /// Hàm này đảm bảo UI được vẽ lại ngay sau khi sạc dầu
+    /// </summary>
+    public void UpdateDebugUI()
+    {
+        // Gọi event để thông báo UI cập nhật
+        NotifyOilChanged();
+        
+        // Force update property để trigger setter (nếu có logic trong setter)
+        currentOil = _currentOil;
+        
+        Debug.Log($"[LanternSystem] ✅ UpdateDebugUI() được gọi - Dầu: {_currentOil:F1}/{maxOil}");
     }
 
     /// <summary>
@@ -330,6 +387,18 @@ public class LanternSystem : MonoBehaviour
     public float GetOilPercentage()
     {
         return _currentOil / maxOil;
+    }
+    
+    /// <summary>
+    /// Debug method: Kiểm tra và log giá trị dầu hiện tại
+    /// </summary>
+    public void DebugOilStatus()
+    {
+        Debug.Log($"[LanternSystem] 🔍 DEBUG OIL STATUS - Instance ID: {GetInstanceID()}");
+        Debug.Log($"[LanternSystem] _currentOil (private): {_currentOil:F1}");
+        Debug.Log($"[LanternSystem] currentOil (property): {currentOil:F1}");
+        Debug.Log($"[LanternSystem] maxOil: {maxOil:F1}");
+        Debug.Log($"[LanternSystem] Percentage: {GetOilPercentage() * 100:F1}%");
     }
 
     /// <summary>

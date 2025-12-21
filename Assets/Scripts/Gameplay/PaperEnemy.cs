@@ -353,6 +353,14 @@ public class PaperEnemy : MonoBehaviour
     }
     
     /// <summary>
+    /// Kiểm tra xem Ma đã bắt đầu hoạt động chưa (đã hết delay)
+    /// </summary>
+    public bool IsEnemyActive()
+    {
+        return canMove;
+    }
+    
+    /// <summary>
     /// Xử lý khi ma chạm vào Player (dùng Trigger)
     /// </summary>
     void OnTriggerEnter(Collider other)

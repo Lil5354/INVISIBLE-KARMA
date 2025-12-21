@@ -213,6 +213,8 @@ public class StreetLamp : MonoBehaviour
         
         // Sạc dầu
         float oldOil = lantern.currentOil;
+        Debug.Log($"[StreetLamp] 🔍 TRƯỚC KHI SẠC: currentOil = {oldOil:F1}/{lantern.maxOil}");
+        
         lantern.AddOil(oilRefillAmount);
         lastRefillTime = Time.time;
         
@@ -226,14 +228,22 @@ public class StreetLamp : MonoBehaviour
         if (Mathf.Abs(newOil - expectedOil) > 0.1f)
         {
             Debug.LogWarning($"[StreetLamp] ⚠️ CẢNH BÁO: Dầu không được cập nhật đúng! Mong đợi: {expectedOil:F1}, Thực tế: {newOil:F1}");
-            Debug.LogWarning($"[StreetLamp] Đang thử cập nhật lại...");
-            // Thử cập nhật lại
+            Debug.LogWarning($"[StreetLamp] Đang thử cập nhật lại bằng property setter...");
+            // Thử cập nhật lại bằng property setter (để trigger log nếu có)
             lantern.currentOil = expectedOil;
-            Debug.Log($"[StreetLamp] Đã cập nhật lại: {lantern.currentOil:F1}/{lantern.maxOil}");
+            float finalOil = lantern.currentOil;
+            Debug.Log($"[StreetLamp] Đã cập nhật lại: {finalOil:F1}/{lantern.maxOil}");
+            
+            // Debug chi tiết
+            lantern.DebugOilStatus();
         }
         else
         {
             Debug.Log($"[StreetLamp] ✅ Dầu đã được cập nhật đúng!");
+            Debug.Log($"[StreetLamp] 🔍 XÁC NHẬN CUỐI CÙNG: currentOil = {newOil:F1}/{lantern.maxOil}");
+            
+            // Debug chi tiết để đảm bảo UI có thể đọc được
+            lantern.DebugOilStatus();
         }
         
         // Phát âm thanh nếu có
@@ -356,13 +366,72 @@ public class StreetLamp : MonoBehaviour
         
         if (other.CompareTag("Player"))
         {
-            // Có thể giảm stress ở đây nếu muốn
+            // Báo cho StressManager biết player đang an toàn
             StressManager stressMgr = other.GetComponent<StressManager>();
+            if (stressMgr == null)
+            {
+                stressMgr = other.GetComponentInChildren<StressManager>();
+            }
+            if (stressMgr == null && StressManager.instance != null)
+            {
+                stressMgr = StressManager.instance;
+            }
+            
             if (stressMgr != null)
             {
-                stressMgr.AddStress(-0.1f); // Giảm stress khi vào vùng an toàn
+                stressMgr.SetSafeStatus(true);
+                Debug.Log($"[StreetLamp] Player vào vùng an toàn - SetSafeStatus(true)");
             }
         }
+    }
+    
+    /// <summary>
+    /// Khi Player đi ra khỏi vùng an toàn (nếu dùng Trigger)
+    /// </summary>
+    void OnTriggerExit(Collider other)
+    {
+        if (!isOn) return; // Đèn chưa sáng thì không có tác dụng
+        
+        if (other.CompareTag("Player"))
+        {
+            // Báo cho StressManager biết player không còn an toàn
+            // Lưu ý: Chỉ set false nếu không còn đèn nào khác bảo vệ
+            // Tạm thời set false, StressManager sẽ tự kiểm tra lại
+            StressManager stressMgr = other.GetComponent<StressManager>();
+            if (stressMgr == null)
+            {
+                stressMgr = other.GetComponentInChildren<StressManager>();
+            }
+            if (stressMgr == null && StressManager.instance != null)
+            {
+                stressMgr = StressManager.instance;
+            }
+            
+            if (stressMgr != null)
+            {
+                // Kiểm tra xem có đèn nào khác đang bảo vệ không
+                bool stillSafe = CheckOtherLamps(other.transform.position);
+                stressMgr.SetSafeStatus(stillSafe);
+                Debug.Log($"[StreetLamp] Player ra khỏi vùng an toàn - SetSafeStatus({stillSafe})");
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Kiểm tra xem có đèn đường nào khác đang bảo vệ player không
+    /// </summary>
+    bool CheckOtherLamps(Vector3 playerPosition)
+    {
+        StreetLamp[] allLamps = FindObjectsOfType<StreetLamp>();
+        foreach (StreetLamp lamp in allLamps)
+        {
+            if (lamp == this) continue; // Bỏ qua đèn hiện tại
+            if (lamp != null && lamp.IsLit() && lamp.IsInProtectionZone(playerPosition))
+            {
+                return true; // Vẫn còn đèn khác bảo vệ
+            }
+        }
+        return false; // Không còn đèn nào bảo vệ
     }
     
     /// <summary>
