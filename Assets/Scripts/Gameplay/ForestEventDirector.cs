@@ -354,3 +354,5 @@ public class ForestEventDirector : MonoBehaviour
         Debug.Log("[ForestEventDirector] Đã reset tất cả events");
     }
 }
+
+

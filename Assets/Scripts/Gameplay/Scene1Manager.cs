@@ -254,3 +254,5 @@ public class Scene1Manager : MonoBehaviour
         Debug.Log("[Scene1Manager] Đã skip toàn bộ scene 1");
     }
 }
+
+
