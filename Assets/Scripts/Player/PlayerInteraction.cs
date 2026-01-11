@@ -28,6 +28,12 @@ public class PlayerInteraction : MonoBehaviour
         // Kiểm tra xem có đang nhìn vào đèn không
         CheckForInteractable();
         
+        // Kiểm tra click chuột trái (tương tác với ClickToZoom và CollectableItem)
+        if (Input.GetMouseButtonDown(0))
+        {
+            PerformInteraction();
+        }
+        
         // Kiểm tra nút bấm E (bật/tắt đèn)
         if (Input.GetKeyDown(interactKey))
         {
@@ -155,6 +161,37 @@ public class PlayerInteraction : MonoBehaviour
         canInteract = false;
     }
     
+    /// <summary>
+    /// Xử lý tương tác khi click chuột trái (bắn tia từ center màn hình)
+    /// </summary>
+    void PerformInteraction()
+    {
+        // Bắn tia từ giữa màn hình
+        Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        RaycastHit hit;
+
+        // Bắn xa interactRange mét
+        LayerMask layerToUse = ignoreLayerMask ? -1 : interactableLayer;
+        if (Physics.Raycast(ray, out hit, interactRange, layerToUse))
+        {
+            // 1. Kiểm tra nhặt đồ
+            CollectableItem item = hit.collider.GetComponent<CollectableItem>();
+            if (item != null)
+            {
+                item.BiNhat(); // Nhặt đồ
+                return;
+            }
+
+            // 2. Kiểm tra hình nhân (ClickToZoom)
+            ClickToZoom hinhNhan = hit.collider.GetComponent<ClickToZoom>();
+            if (hinhNhan != null)
+            {
+                hinhNhan.TuongTac(); // Gọi hàm tương tác
+                return;
+            }
+        }
+    }
+
     /// <summary>
     /// Thử bật/tắt đèn (phím E)
     /// </summary>
