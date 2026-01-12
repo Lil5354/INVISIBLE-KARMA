@@ -1,208 +1,135 @@
 using UnityEngine;
 
-/// <summary>
-/// Script "Tắc Kè Hoa" - Quản lý việc thay đổi Material cho 1 Quad duy nhất
-/// Khi chọn đồ khác nhau, Quad sẽ tự động đổi Material tương ứng
-/// </summary>
 public class SmartSticker : MonoBehaviour
 {
     [Header("Cài đặt chung")]
     public Camera mainCam;
-    public LayerMask layerConRoi; // Layer của con rối
-    public GameObject ghostQuad;  // Kéo cái Quad duy nhất vào đây
-    public MeshRenderer ghostRenderer; // Kéo chính cái Quad vào đây (nó có component MeshRenderer)
-
-    [Header("Kho Đồ (Kéo 4 Material vào đây theo thứ tự)")]
-    [Tooltip("0: Áo Trước, 1: Áo Sau, 2: Váy, 3: Khăn")]
-    public Material[] danhSachHinhAnh; 
+    public LayerMask layerConRoi;
+    
+    // --- THAY ĐỔI Ở ĐÂY ---
+    [Header("Danh sách 4 Mảnh Giấy Nháp (Ghost Objects)")]
+    // Kéo 4 cái Quad riêng biệt vào đây theo đúng thứ tự:
+    // 0: Áo Trước, 1: Áo Sau, 2: Váy, 3: Khăn
+    public GameObject[] ghostQuads;
+    // ---------------------
 
     [Header("Cài đặt logic")]
-    public float khoangCachHo = 0.01f;
+    public float khoangCachHo = 0.02f; // Nhích ra khỏi da một chút
 
     private int idDangCam = -1; // -1 là chưa cầm gì
     private bool dangKeo = false;
 
-    void Start()
-    {
-        // Tự động tìm Camera nếu chưa gán
-        if (mainCam == null)
-        {
-            mainCam = Camera.main;
-            if (mainCam == null)
-            {
-                mainCam = FindObjectOfType<Camera>();
-            }
-        }
-
-        // Tự động lấy MeshRenderer từ ghostQuad nếu chưa gán
-        if (ghostRenderer == null && ghostQuad != null)
-        {
-            ghostRenderer = ghostQuad.GetComponent<MeshRenderer>();
-        }
-
-        // Ẩn Quad lúc đầu
-        if (ghostQuad != null)
-        {
-            ghostQuad.SetActive(false);
-        }
-    }
-
-    /// <summary>
-    /// Hàm này gọi từ UI (khi bấm vào icon trong túi đồ)
-    /// </summary>
-    /// <param name="idMonDo">0: Áo Trước, 1: Áo Sau, 2: Váy, 3: Khăn</param>
+    // Hàm gọi từ UI
     public void BatDauCamDo(int idMonDo)
     {
-        // 1. Lưu lại ID món đồ đang cầm
-        idDangCam = idMonDo;
+        Debug.Log($"[SmartSticker] Nút UI gọi BatDauCamDo với ID = {idMonDo}");
+        
+        // 1. Tắt hết các Ghost cũ đi (đề phòng)
+        TatHetGhost();
 
-        // 2. Thay áo cho cái Quad (QUAN TRỌNG NHẤT)
-        if (idMonDo >= 0 && idMonDo < danhSachHinhAnh.Length && danhSachHinhAnh[idMonDo] != null)
+        // 2. Kiểm tra ID hợp lệ
+        if (idMonDo >= 0 && idMonDo < ghostQuads.Length)
         {
-            if (ghostRenderer != null)
+            idDangCam = idMonDo;
+            // 3. Bật đúng cái Quad tương ứng lên
+            if(ghostQuads[idDangCam] != null)
             {
-                ghostRenderer.material = danhSachHinhAnh[idMonDo];
-                Debug.Log($"[SmartSticker] Đã đổi Material sang món đồ ID: {idMonDo}");
+                ghostQuads[idDangCam].SetActive(true);
+                dangKeo = true;
             }
-            else
-            {
-                Debug.LogError("[SmartSticker] ghostRenderer chưa được gán!");
-            }
-        }
-        else
-        {
-            Debug.LogWarning($"[SmartSticker] ID món đồ không hợp lệ hoặc Material chưa được gán: {idMonDo}");
-            return;
-        }
-
-        // 3. Hiện cái Quad lên và bắt đầu dính chuột
-        if (ghostQuad != null)
-        {
-            ghostQuad.SetActive(true);
-            dangKeo = true;
-        }
-        else
-        {
-            Debug.LogError("[SmartSticker] ghostQuad chưa được gán!");
         }
     }
 
     void Update()
     {
-        if (dangKeo)
+        if (dangKeo && idDangCam != -1)
         {
             XuLyTruotTrenDa();
 
-            if (Input.GetMouseButtonDown(0)) // Bấm chuột để dán
-            {
+            // Bấm chuột trái để dán
+            if (Input.GetMouseButtonDown(0)) {
                 ThuDanGiay();
             }
 
-            // Nhấn ESC hoặc chuột phải để hủy
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1))
+            // Bấm chuột phải hoặc ESC để hủy
+            if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
             {
                 ketThucKeo();
             }
         }
     }
 
-    /// <summary>
-    /// Xử lý việc trượt Quad trên da con rối
-    /// </summary>
     void XuLyTruotTrenDa()
     {
-        if (mainCam == null || ghostQuad == null)
-        {
-            return;
-        }
+        // Dùng tâm màn hình (nếu bạn dùng tâm ngắm) hoặc vị trí chuột
+        // Nếu dùng chuột Windows:
+        // Ray ray = mainCam.ScreenPointToRay(Input.mousePosition); 
 
-        Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
+        // Nếu dùng Tâm Ngắm giữa màn hình (như bạn đã setup ở bài trước):
+        Ray ray = mainCam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+
         RaycastHit hit;
-
         if (Physics.Raycast(ray, out hit, 10f, layerConRoi))
         {
-            // Dính Quad vào bề mặt da
-            ghostQuad.transform.position = hit.point + (hit.normal * khoangCachHo);
-            ghostQuad.transform.rotation = Quaternion.LookRotation(-hit.normal);
+            // Di chuyển cái Quad ĐANG CẦM (theo idDangCam)
+            GameObject currentGhost = ghostQuads[idDangCam];
+            if (currentGhost != null)
+            {
+                currentGhost.transform.position = hit.point + (hit.normal * khoangCachHo);
+                currentGhost.transform.rotation = Quaternion.LookRotation(-hit.normal);
+            }
         }
     }
 
-    /// <summary>
-    /// Xử lý việc dán giấy (khi click chuột)
-    /// </summary>
     void ThuDanGiay()
     {
-        if (mainCam == null)
-        {
-            return;
-        }
-
-        Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
+        // Bắn tia kiểm tra lại lần nữa để xác định vùng dán
+        Ray ray = mainCam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         RaycastHit hit;
 
         if (Physics.Raycast(ray, out hit, 10f, layerConRoi))
         {
             string tagDung = "";
-            
-            // Quy định luật chơi (ID nào tương ứng Tag nào)
             switch (idDangCam)
             {
                 case 0: tagDung = "Zone_NgucTruoc"; break;
                 case 1: tagDung = "Zone_NgucSau"; break;
-                case 2: tagDung = "Zone_Chan"; break; // Váy
-                case 3: tagDung = "Zone_Dau"; break;  // Khăn
-                default:
-                    Debug.LogWarning($"[SmartSticker] ID món đồ không hợp lệ: {idDangCam}");
-                    return;
+                case 2: tagDung = "Zone_Chan"; break; 
+                case 3: tagDung = "Zone_Dau"; break; 
             }
 
-            // Kiểm tra Tag
+            // DEBUG: Hiện tag của zone đang dán vào
+            Debug.Log($"[SmartSticker] Đang cầm món ID={idDangCam}, cần tag '{tagDung}', zone hiện tại có tag '{hit.collider.tag}'");
+
+            // Kiểm tra Tag (Zone_NgucTruoc, Zone_NgucSau...)
             if (hit.collider.CompareTag(tagDung))
             {
-                Debug.Log($"[SmartSticker] ✅ Dán đúng món số: {idDangCam} vào vùng: {tagDung}");
-                
-                // GỌI HÀM GHI NHẬN BÊN QUẢN LÝ (Trọng tài)
-                if (InventoryManager.Instance != null)
-                {
-                    InventoryManager.Instance.GhiNhanDanDung(idDangCam);
-                }
-                else
-                {
-                    Debug.LogError("[SmartSticker] InventoryManager.Instance không tồn tại! Hãy tạo GameObject có script InventoryManager.");
-                }
-                
-                // Trigger event để các script khác có thể lắng nghe
-                OnStickerPlacedCorrectly?.Invoke(idDangCam, tagDung);
-                
-                // Dán xong thì tắt chế độ cầm đồ (ẩn Quad đi)
+                Debug.Log($"[SmartSticker] ✅ Dán ĐÚNG vị trí! Tag khớp: {tagDung}");
+                // GỌI HÀM MỚI BÊN MANAGER
+                InventoryManager.Instance.XuLyDanDo(idDangCam);
+                // Tắt miếng giấy dán nháp đi
                 ketThucKeo();
             }
             else
             {
-                Debug.Log($"[SmartSticker] ❌ Sai vị trí rồi! Cần dán vào: {tagDung}, nhưng click vào: {hit.collider.tag}");
-                // Có thể thêm âm thanh "Sai rồi"
-                OnStickerPlacedIncorrectly?.Invoke(idDangCam, hit.collider.tag);
+                Debug.Log($"[SmartSticker] ❌ Dán SAI vị trí! Cần '{tagDung}' nhưng đang dán vào '{hit.collider.tag}'");
             }
         }
     }
 
-    /// <summary>
-    /// Kết thúc kéo và ẩn Quad
-    /// </summary>
     void ketThucKeo()
     {
         dangKeo = false;
-        if (ghostQuad != null)
-        {
-            ghostQuad.SetActive(false); // Ẩn cái Quad đi chờ lần sau dùng tiếp
-        }
+        TatHetGhost();
         idDangCam = -1;
-        Debug.Log("[SmartSticker] Đã kết thúc kéo");
     }
 
-    // Events để các script khác có thể lắng nghe
-    public delegate void StickerPlacedEvent(int itemID, string zoneTag);
-    public static event StickerPlacedEvent OnStickerPlacedCorrectly;
-    public static event StickerPlacedEvent OnStickerPlacedIncorrectly;
+    void TatHetGhost()
+    {
+        // Chạy vòng lặp tắt sạch sẽ cả 4 cái
+        foreach(var g in ghostQuads)
+        {
+            if(g != null) g.SetActive(false);
+        }
+    }
 }
-

@@ -6,6 +6,10 @@ TagManager:
   tags:
   - Lantern
   - Enemy
+  - Zone_Dau
+  - Zone_Chan
+  - Zone_NgucSau
+  - Zone_NgucTruoc
   layers:
   - Default
   - TransparentFX
