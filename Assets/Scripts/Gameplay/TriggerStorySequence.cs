@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,7 +19,7 @@ public class TriggerStorySequence : MonoBehaviour
     [Header("--- CẤU HÌNH UI ---")]
     public GameObject panelChuyenCanh; // Cái Panel to chứa tất cả
     public Image imgHienThi;           // Nơi hiện ảnh 2D
-    public TMP_Text textHienThi;       // Nơi hiện chữ
+    public Text textHienThi;           // Đã đổi từ TMP_Text sang Text thường
 
     [Header("--- CẤU HÌNH CỐT TRUYỆN ---")]
     // Danh sách 5 scene của bạn sẽ nằm ở đây
@@ -403,5 +402,20 @@ public class TriggerStorySequence : MonoBehaviour
                 Gizmos.DrawWireSphere(sphere.center, sphere.radius);
             }
         }
+    }
+    
+    // Hàm này sẽ tìm tất cả quái và tắt chúng đi
+    void VoHieuHoaKeThu()
+    {
+        // Tìm tất cả object có Tag là "Enemy"
+        GameObject[] luQuaiVat = GameObject.FindGameObjectsWithTag("Enemy");
+
+        foreach (GameObject quai in luQuaiVat)
+        {
+            // Tắt nó đi (Nó sẽ biến mất và không gây damage được nữa)
+            quai.SetActive(false);
+        }
+        
+        Debug.Log("Đã vô hiệu hóa " + luQuaiVat.Length + " con quái!");
     }
 }

@@ -1,13 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using System.Collections;
 
 public class StoryTransition : MonoBehaviour
 {
     [Header("Cấu hình UI")]
     public GameObject panelChuyenCanh; 
-    public TMP_Text textHienThi;       
+    public Text textHienThi;       // Đã đổi từ TMP_Text sang Text thường       
 
     [Header("Cấu hình Nội Dung")]
     [TextArea(3, 10)] 

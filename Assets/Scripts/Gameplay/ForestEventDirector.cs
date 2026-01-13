@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections;
-using TMPro; // Để hiện chữ
-using UnityEngine.UI;
+using UnityEngine.UI; // Đã đổi từ TMPro sang UI thường
 using UnityEngine.SceneManagement; // Để chuyển cảnh sau khi ngất
 
 /// <summary>
@@ -14,8 +13,8 @@ public class ForestEventDirector : MonoBehaviour
     [Tooltip("Panel chứa subtitle (DialoguePanel)")]
     public GameObject dialoguePanel;
     
-    [Tooltip("TextMeshPro hiển thị lời thoại")]
-    public TextMeshProUGUI dialogueText;
+    [Tooltip("Text hiển thị lời thoại (đã đổi từ TextMeshPro sang Text thường)")]
+    public Text dialogueText;
 
     [Header("Diễn viên (Models)")]
     [Tooltip("Hình nhân áo vàng (ban đầu setActive = false)")]
