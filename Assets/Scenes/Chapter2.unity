@@ -3243,8 +3243,8 @@ Transform:
   m_GameObject: {fileID: 1270173590}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.921, y: 0.568, z: 0.285}
-  m_LocalScale: {x: 1, y: 1.8007845, z: 1}
+  m_LocalPosition: {x: 1.921, y: 0.541, z: 0.285}
+  m_LocalScale: {x: 1, y: 1.6238272, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5904800974883464237}
@@ -5044,8 +5044,8 @@ Transform:
   m_GameObject: {fileID: 2089408405}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.114, y: 0.08, z: -0.059}
-  m_LocalScale: {x: 1, y: 1.1001989, z: 1}
+  m_LocalPosition: {x: 2.114, y: -0.17436, z: -0.059}
+  m_LocalScale: {x: 1, y: 0.79059196, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5904800974883464237}
@@ -5447,7 +5447,6 @@ GameObject:
   - component: {fileID: 5904800974883464237}
   - component: {fileID: 6537469223755546264}
   - component: {fileID: 6537469223755546265}
-  - component: {fileID: 6537469223755546266}
   m_Layer: 0
   m_Name: hinhnhango
   m_TagString: Untagged
@@ -5496,21 +5495,6 @@ MonoBehaviour:
   amThanhClick: {fileID: 0}
   tuDongTrigger: 0
   banKinhAutoTrigger: 2
---- !u!114 &6537469223755546266
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6537469223755546263}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 17c615ddd76fea94d87af657578a70d2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tocDoXoay: 500
-  daoNguocHuong: 1
-  cameraSoiHinhNhan: {fileID: 1879057159}
 --- !u!4 &7510086945129182239
 Transform:
   m_ObjectHideFlags: 0
