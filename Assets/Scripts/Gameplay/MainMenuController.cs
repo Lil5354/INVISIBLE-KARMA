@@ -8,30 +8,66 @@ using UnityEngine.SceneManagement; // Thư viện bắt buộc để chuyển c�
 public class MainMenuController : MonoBehaviour
 {
     [Header("Cài đặt Màn Chơi")]
-    [Tooltip("Index của scene Chapter1 trong Build Settings (MainMenu = 0, Chapter1 = 1)")]
-    public int chapter1SceneIndex = 1; // Index 1 = Chapter1 trong Build Settings
+    [Tooltip("Tên scene Intro để chuyển đến khi bấm Play")]
+    public string introSceneName = "IntroStrBFC1.1"; // Scene intro sẽ chạy trước
+    
+    [Tooltip("Dùng tên scene thay vì index (khuyến nghị)")]
+    public bool useSceneName = true;
+    
+    [Tooltip("Index của scene trong Build Settings (backup nếu không dùng tên)")]
+    public int introSceneIndex = 1;
 
     [Header("Cài đặt UI Phụ")]
     public GameObject optionsPanel; // Kéo cái bảng Option vào đây (nếu có)
 
     /// <summary>
-    /// CHỨC NĂNG CHO NÚT PLAY - Dùng Index thay vì tên (an toàn hơn)
+    /// CHỨC NĂNG CHO NÚT PLAY - Chuyển sang scene Intro
     /// </summary>
     public void PlayGame()
     {
-        Debug.Log($"[MainMenuController] Đang load màn chơi với index: {chapter1SceneIndex}");
-        
-        // Kiểm tra index có hợp lệ không
-        if (chapter1SceneIndex < 0 || chapter1SceneIndex >= SceneManager.sceneCountInBuildSettings)
+        if (useSceneName)
         {
-            Debug.LogError($"[MainMenuController] Scene index {chapter1SceneIndex} không hợp lệ! Tổng số scene trong Build Settings: {SceneManager.sceneCountInBuildSettings}");
-            Debug.LogError($"[MainMenuController] Vui lòng kiểm tra Build Settings và đảm bảo Chapter1 đã được thêm vào!");
-            return;
+            // Dùng tên scene (khuyến nghị)
+            Debug.Log($"[MainMenuController] Đang load scene: {introSceneName}");
+            
+            // Kiểm tra scene có tồn tại không
+            bool sceneExists = false;
+            for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+            {
+                string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
+                string sceneName = System.IO.Path.GetFileNameWithoutExtension(scenePath);
+                if (sceneName == introSceneName)
+                {
+                    sceneExists = true;
+                    Debug.Log($"[MainMenuController] ✅ Tìm thấy scene '{introSceneName}' (Index: {i})");
+                    break;
+                }
+            }
+            
+            if (!sceneExists)
+            {
+                Debug.LogError($"[MainMenuController] ❌ KHÔNG TÌM THẤY SCENE '{introSceneName}' TRONG BUILD SETTINGS!");
+                Debug.LogError($"[MainMenuController] Vui lòng thêm scene vào File -> Build Settings");
+                return;
+            }
+            
+            SceneManager.LoadScene(introSceneName);
+            Debug.Log($"[MainMenuController] ✅ Đã load scene: {introSceneName}");
         }
-        
-        // Load scene bằng index (an toàn hơn dùng tên)
-        SceneManager.LoadScene(chapter1SceneIndex);
-        Debug.Log($"[MainMenuController] ✅ Đã load scene index {chapter1SceneIndex} thành công!");
+        else
+        {
+            // Dùng index (backup)
+            Debug.Log($"[MainMenuController] Đang load scene với index: {introSceneIndex}");
+            
+            if (introSceneIndex < 0 || introSceneIndex >= SceneManager.sceneCountInBuildSettings)
+            {
+                Debug.LogError($"[MainMenuController] Scene index {introSceneIndex} không hợp lệ!");
+                return;
+            }
+            
+            SceneManager.LoadScene(introSceneIndex);
+            Debug.Log($"[MainMenuController] ✅ Đã load scene index {introSceneIndex}");
+        }
     }
 
     /// <summary>

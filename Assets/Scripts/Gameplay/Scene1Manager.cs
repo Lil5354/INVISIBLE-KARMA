@@ -1,8 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro; // Bắt buộc dùng TextMeshPro
-using UnityEngine.UI;
+using UnityEngine.UI; // Đã đổi từ TMPro sang UI thường
 using UnityEngine.SceneManagement;
 
 [System.Serializable]
@@ -17,11 +16,11 @@ public class StoryLine
 public class Scene1Manager : MonoBehaviour
 {
     [Header("UI References")]
-    [Tooltip("TextMeshPro hiển thị tên nhân vật")]
-    public TextMeshProUGUI nameText;
+    [Tooltip("Text hiển thị tên nhân vật")]
+    public Text nameText;  // Đã đổi từ TextMeshProUGUI sang Text
     
-    [Tooltip("TextMeshPro hiển thị nội dung thoại/mô tả")]
-    public TextMeshProUGUI contentText;
+    [Tooltip("Text hiển thị nội dung thoại/mô tả")]
+    public Text contentText;  // Đã đổi từ TextMeshProUGUI sang Text
     
     [Tooltip("Cái khung chứa tên (để tắt đi khi dẫn truyện) - Tùy chọn")]
     public GameObject nameContainer; // Cái khung chứa tên (để tắt đi khi dẫn truyện)
@@ -163,8 +162,8 @@ public class Scene1Manager : MonoBehaviour
                 nameContainer.SetActive(false);
             }
             
-            // Chữ nghiêng cho lời dẫn
-            contentText.fontStyle = FontStyles.Italic;
+            // Chữ nghiêng cho lời dẫn (Text thường dùng FontStyle)
+            contentText.fontStyle = FontStyle.Italic;
             Debug.Log($"[Scene1Manager] 📖 Dẫn truyện: {line.content.Substring(0, Mathf.Min(30, line.content.Length))}...");
         }
         else
@@ -178,7 +177,7 @@ public class Scene1Manager : MonoBehaviour
             }
             
             // Chữ bình thường cho lời thoại
-            contentText.fontStyle = FontStyles.Normal;
+            contentText.fontStyle = FontStyle.Normal;
             Debug.Log($"[Scene1Manager] 💬 {line.characterName}: {line.content.Substring(0, Mathf.Min(30, line.content.Length))}...");
         }
 
@@ -200,34 +199,39 @@ public class Scene1Manager : MonoBehaviour
         
         storyLines.Add(new StoryLine { 
             isNarration = true, 
-            content = "Gió thổi mạnh. Tiền vàng mã bay tứ tung trong ánh đèn lồng đỏ quạch." 
+            content = "Gió đêm rít từng cơn lạnh buốt. Những đồng tiền vàng mã bị cuốn bay tứ tung, xoay vòng trong ánh đèn lồng đỏ quạch như một đám tang không người."
         });
 
         storyLines.Add(new StoryLine { 
             isNarration = true, 
-            content = "Linh bước xuống xe. Cô cầm điện thoại lên cao cố tìm sóng, nhưng màn hình chỉ báo 'No Signal'." 
+            content = "Linh bước xuống xe. Cô tuyệt vọng giơ cao chiếc điện thoại, nhưng dòng chữ 'No Signal' nhấp nháy .."
         });
 
         storyLines.Add(new StoryLine { 
             characterName = "LINH", 
-            content = "Bố ơi... Bố gọi con về gấp, sao mọi thứ lại lạnh tanh thế này? Mọi người đi đâu hết rồi?" 
+            content = "Cha ơi... Cuối cùng con cũng về lại nơi này, sao mọi thứ lại lạnh tanh thế này?.... Mọi người đi đâu hết rồi?" 
         });
 
         storyLines.Add(new StoryLine { 
             isNarration = true, 
-            content = "Linh đi sâu vào làng. Không một bóng người. Cửa các nhà đều đóng kín..." 
+            content = "Linh đi sâu vào trong thôn. Không một bóng người sống. Cửa các ngôi nhà gỗ đều đóng im ỉm, then cài chặt như sợ hãi một thứ gì đó từ bên ngoài"
         });
 
         storyLines.Add(new StoryLine { 
             isNarration = true, 
-            content = "...bên ngoài bày la liệt những hàng mã: Ngựa giấy, xe hơi giấy, và những hình nhân người hầu đứng rũ rượi." 
+            content = "...Chỉ có những hàng mã được bày la liệt. Ngựa giấy, xe tang, và những hình nhân thế mạng đứng rũ rượi... đôi mắt chấm mực đen vô hồn như đang dõi theo từng bước chân của cô."
         });
 
         storyLines.Add(new StoryLine { 
             isNarration = true, 
             content = "Sự im lặng bao trùm đến mức Linh có thể nghe thấy tiếng tim mình đập thình thịch." 
         });
-        
+        storyLines.Add(new StoryLine
+        {
+            isNarration = true,
+            content = "Phía trước là Rừng Trúc. Ánh trăng rằm soi rõ con đường độc đạo... Cô bắt buộc phải đi qua nó."
+        });
+
         Debug.Log($"[Scene1Manager] ✅ Đã load {storyLines.Count} dòng kịch bản từ code");
     }
     
