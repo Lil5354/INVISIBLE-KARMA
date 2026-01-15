@@ -7,10 +7,12 @@ public class StoryTransition : MonoBehaviour
     [Header("Cấu hình UI")]
     public GameObject panelChuyenCanh; 
     public Text textHienThi;       // Đã đổi từ TMP_Text sang Text thường       
+    public AudioSource nguonPhatAm; // AudioSource để phát voice
 
     [Header("Cấu hình Nội Dung")]
     [TextArea(3, 10)] 
     public string[] cacCauThoai;       
+    public AudioClip[] cacAmThanhThoai; // Audio cho từng câu thoại
     public float tocDoGoChu = 0.05f;   
 
     [Header("CẤU HÌNH NGƯỜI CHƠI (BẮT BUỘC)")]
@@ -50,6 +52,7 @@ public class StoryTransition : MonoBehaviour
         TogglePlayerControl(false);
 
         indexCauThoai = 0;
+        PhatAmThanh(indexCauThoai);
         StartCoroutine(GoChu(cacCauThoai[indexCauThoai]));
     }
 
@@ -59,6 +62,7 @@ public class StoryTransition : MonoBehaviour
         indexCauThoai++;
         if (indexCauThoai < cacCauThoai.Length)
         {
+            PhatAmThanh(indexCauThoai);
             StartCoroutine(GoChu(cacCauThoai[indexCauThoai]));
         }
         else
@@ -162,5 +166,17 @@ public class StoryTransition : MonoBehaviour
         }
         
         Debug.Log("[StoryTransition] Đã hoàn thành auto-enable player scripts");
+    }
+
+    void PhatAmThanh(int index)
+    {
+        if (nguonPhatAm == null) return;
+        if (cacAmThanhThoai == null || index >= cacAmThanhThoai.Length) return;
+        
+        if (cacAmThanhThoai[index] != null)
+        {
+            nguonPhatAm.clip = cacAmThanhThoai[index];
+            nguonPhatAm.Play();
+        }
     }
 }

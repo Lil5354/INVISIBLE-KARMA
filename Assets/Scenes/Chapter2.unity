@@ -888,6 +888,81 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &427333506
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 427333507}
+  - component: {fileID: 427333509}
+  - component: {fileID: 427333508}
+  m_Layer: 5
+  m_Name: KHUNG
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &427333507
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 427333506}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2035205243}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -1.1329346, y: 98}
+  m_SizeDelta: {x: -52.0671, y: 121.490814}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &427333508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 427333506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.8901961}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &427333509
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 427333506}
+  m_CullTransparentMesh: 1
 --- !u!1 &444072942 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -5824889680639641240, guid: ee320df560150c042a834bee280b9a1d, type: 3}
@@ -2240,13 +2315,47 @@ MonoBehaviour:
   panelChuyenCanh: {fileID: 2035205242}
   imgHienThi: {fileID: 2125595909}
   textHienThi: {fileID: 1386043150}
+  nguonPhatAm: {fileID: 0}
   danhSachCacCanh:
   - tenCanh: 
-    hinhAnhHienThi: {fileID: 0}
+    hinhAnhHienThi: {fileID: 21300000, guid: c869eebbcf3091247b0b92aa2403091c, type: 3}
+    loiThoai:
+    - "Con \u0111\xE3 nh\u1EA7m r\u1ED3i... \u0110\xE2y kh\xF4ng ph\u1EA3i l\u1EC5
+      ph\u1EE5c an ngh\u1EC9. \u0110\xF3 l\xE0 '\xC1o Kh\xE2m Li\u1EC7m \u0110\xF4i'.
+      Nghi th\u1EE9c con v\u1EEBa l\xE0m kh\xF4ng ph\u1EA3i \u0111\u1EC3 si\xEAu
+      tho\xE1t, m\xE0 l\xE0 ch\xECa kh\xF3a gi\u1EA3i ph\xF3ng cho 'Song Sinh Luy\u1EC7n
+      C\u1ED1t' n\u0103m x\u01B0a..."
+    AmThanhLoiThoai: []
+  - tenCanh: 
+    hinhAnhHienThi: {fileID: 21300000, guid: 2a62ddec102ce9348986395f2855890c, type: 3}
+    loiThoai:
+    - "O\xE1n kh\xED c\u1EE7a c\u1EB7p song sinh qu\xE1 l\u1EDBn, ch\xFAng \u0111\xE3
+      h\xF3a th\xE0nh qu\u1EF7 d\u1EEF. B\u1ED1 \u0111\xE3 l\u1EADp giao k\xE8o sinh
+      t\u1EED: \u0110\u1ED5i 20 n\u0103m d\u01B0\u01A1ng th\u1ECD \u0111\u1EC3 tr\u1EA5n
+      gi\u1EEF ch\xFAng th\xEAm m\u1ED9t v\xF2ng hoa gi\xE1p. V\xEC th\u1EBF b\u1ED1
+      m\u1EDBi ra \u0111i \u1EDF tu\u1ED5i 58... ch\u1EE9 kh\xF4ng th\u1EC3 \u0111\u1EE3i
+      \u0111\u1EBFn 80."
+    AmThanhLoiThoai: []
+  - tenCanh: 
+    hinhAnhHienThi: {fileID: 21300000, guid: 4ca4c26353fe86f44951fd40a52d8725, type: 3}
+    loiThoai:
+    - "Phong \u1EA5n \u0111\xE3 v\u1EE1... T\u1EA1i sao l\u1EA1i c\xF3 m\xF9i b\xF9n
+      tanh? S\xE0n nh\xE0... \u0111ang bi\u1EBFn th\xE0nh \u0111\u1EA7m l\u1EA7y
+      sao?"
+    AmThanhLoiThoai: []
+  - tenCanh: 
+    hinhAnhHienThi: {fileID: 21300000, guid: a753d7c4c2bfd58409110dc98adf34d4, type: 3}
+    loiThoai:
+    - "T\xECm th\u1EA5y ch\u1ECB r\u1ED3i... Xu\u1ED1ng \u0111\xE2y ch\u01A1i v\u1EDBi
+      t\u1EE5i em... Xu\u1ED1ng \u0111\xE1y s\xF4ng l\u1EA1nh l\u1EBDo n\xE0y.."
+    AmThanhLoiThoai: []
+  - tenCanh: 
+    hinhAnhHienThi: {fileID: 21300000, guid: ae06223f445c7c949908d3f64333e9cc, type: 3}
     loiThoai:
     - "Mu\u1ED1n t\xECm v\u1EADt tr\u1EA5n, ph\u1EA3i l\u1EB7n xu\u1ED1ng \u0111\xE1y
       oan khi\xEAn..."
     - TO BE CONTINUED
+    AmThanhLoiThoai: []
   tenSceneTiepTheo: Chapter2
   tocDoGoChu: 0.04
   scriptsCanKhoa: []
@@ -3757,10 +3866,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2035205243}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 10.7984, y: -93.65}
-  m_SizeDelta: {x: 724.0696, y: 259.2143}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: 4.077759, y: 95.16589}
+  m_SizeDelta: {x: -104.815674, y: 66.88501}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1386043150
 MonoBehaviour:
@@ -3783,13 +3892,13 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: e3265ab4bf004d28a9537516768c1c75, type: 3}
-    m_FontSize: 25
-    m_FontStyle: 0
+    m_Font: {fileID: 12800000, guid: 4beb055f07aaff244873dec698d0363e, type: 3}
+    m_FontSize: 20
+    m_FontStyle: 3
     m_BestFit: 0
     m_MinSize: 2
     m_MaxSize: 40
-    m_Alignment: 1
+    m_Alignment: 0
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
@@ -5285,8 +5394,9 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1386043149}
   - {fileID: 2125595908}
+  - {fileID: 427333507}
+  - {fileID: 1386043149}
   m_Father: {fileID: 612144672}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -5307,7 +5417,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -5502,8 +5612,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 347.3, y: 133.4}
-  m_SizeDelta: {x: -700, y: -270}
+  m_AnchoredPosition: {x: 0, y: 0.000030517578}
+  m_SizeDelta: {x: -0.00024414, y: -0.000030517578}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2125595909
 MonoBehaviour:
@@ -5518,7 +5628,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0.21960786, g: 0.21960786, b: 0.21960786, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

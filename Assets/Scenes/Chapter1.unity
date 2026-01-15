@@ -259,12 +259,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   panelChuyenCanh: {fileID: 181010433}
   textHienThi: {fileID: 2042529366}
+  nguonPhatAm: {fileID: 0}
   cacCauThoai:
   - " Ph\xEDa tr\u01B0\u1EDBc l\xE0 \u0111\u01B0\u1EDDng c\u1EE5t sao??"
   - "Kh\xF4ng! D\u01B0\u1EDDng nh\u01B0 ph\xEDa tr\u01B0\u1EDBc v\u1EABn c\xF2n con
     \u0111\u01B0\u1EDDng"
   - "M\xECnh ph\u1EA3i \u0111i th\u1EB3ng v\u1EC1 ph\xEDa tr\u01B0\u1EDBc \u0111\u1EC3
     c\u1EAFt \u0111u\xF4i b\u1ECDn ch\xFAng!!!"
+  cacAmThanhThoai: []
   tocDoGoChu: 0.05
   cacScriptCanKhoa:
   - {fileID: 551914942}
@@ -909,6 +911,134 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 7469984278845905146, guid: 3d991ca5237bbb44489a790f86d57829, type: 3}
+--- !u!1 &277795970
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 277795972}
+  - component: {fileID: 277795971}
+  m_Layer: 0
+  m_Name: Audio Source
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!82 &277795971
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 277795970}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!4 &277795972
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 277795970}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.26000023, y: 5.3500004, z: 105.47}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &283269664
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3169,6 +3299,7 @@ MonoBehaviour:
   panelChuyenCanh: {fileID: 852857070}
   imgHienThi: {fileID: 730829135}
   textHienThi: {fileID: 81019864}
+  nguonPhatAm: {fileID: 277795971}
   danhSachCacCanh:
   - tenCanh: chay
     hinhAnhHienThi: {fileID: 21300000, guid: f95cb83ae867cee4888ea709bdf17132, type: 3}
@@ -3179,10 +3310,17 @@ MonoBehaviour:
     - "C\u1EA3nh quan th\u1EADt m\xF9 m\u1ECBt v\xE0....."
     - "Cho\xE1ng qu..\xE1.."
     - "Ch..u..y..\u1EC7n g\xEC \u0111a..ng x\u1EA3y ra v\u1EADy..."
+    AmThanhLoiThoai:
+    - {fileID: 8300000, guid: ae6e8b25d3c9bad4ca298b355d66556e, type: 3}
+    - {fileID: 8300000, guid: a8b869471286cf6468db3ac081ce9279, type: 3}
+    - {fileID: 8300000, guid: 8cbef933c3894ad4d979dcd056d4de8c, type: 3}
+    - {fileID: 8300000, guid: 236e7e05fde3f86428e22c815344b008, type: 3}
+    - {fileID: 8300000, guid: 57e305f90b43e57498913b6569dac008, type: 3}
   - tenCanh: ngatxiutrongrung
     hinhAnhHienThi: {fileID: 21300000, guid: cca6103e130ae884791726dc86c27b59, type: 3}
     loiThoai:
     - ....
+    AmThanhLoiThoai: []
   - tenCanh: 
     hinhAnhHienThi: {fileID: 21300000, guid: 3306ca3c6fe43164cb7e0291bfdbbc7f, type: 3}
     loiThoai:
@@ -3196,6 +3334,8 @@ MonoBehaviour:
     - "B\xEAn tr\xE1i em kh\xF3c B\xEAn ph\u1EA3i ch\u1ECB c\u01B0\u1EDDi \u0110\u1EC3
       luy\u1EC7n b\xF9a ng\u01B0\u1EDDi C\u1EA7u t\xE0i, c\u1EA7u l\u1ED9c..."
     - "\u0110\xE2y l\xE0 ti\u1EBFng n\xF3i c\u1EE7a ai..."
+    AmThanhLoiThoai:
+    - {fileID: 8300000, guid: 69c6b42a1a7cba64c840a42573443a8b, type: 3}
   - tenCanh: 
     hinhAnhHienThi: {fileID: 21300000, guid: 045a5512c19734644bd7713ff870cd51, type: 3}
     loiThoai:
@@ -3203,10 +3343,13 @@ MonoBehaviour:
       v\u1EABn b\xE9n Ch\u1EC9 v\u1EABn c\xF2n d\u01B0..."
     - "Hai \u0111\u1EE9a h\u01A1i ch\u1EADt Mu\u1ED1n nh\u1EADp l\xE0m ba L\u1EA1i
       \u0111\xE2y v\u1EDBi ta ...Vui nh\xE0 vui c\u1EEDa!"
+    AmThanhLoiThoai:
+    - {fileID: 8300000, guid: be0672e2331168a43adf1682f64a948a, type: 3}
   - tenCanh: 
     hinhAnhHienThi: {fileID: 21300000, guid: da5c671881c000541b9e653fe4cf2b51, type: 3}
     loiThoai:
     - '!!!!!!!!!!!!!!'
+    AmThanhLoiThoai: []
   tenSceneTiepTheo: Chapter2
   tocDoGoChu: 0.04
   scriptsCanKhoa:
@@ -3214,6 +3357,7 @@ MonoBehaviour:
   - {fileID: 963194229}
   triggerOnce: 1
   autoFindPlayerScripts: 1
+  tuDongKichHoat: 0
 --- !u!65 &901784244
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6653,3 +6797,4 @@ SceneRoots:
   - {fileID: 583617492}
   - {fileID: 901784247}
   - {fileID: 72279100}
+  - {fileID: 277795972}

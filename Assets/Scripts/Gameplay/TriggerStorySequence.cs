@@ -12,6 +12,7 @@ public class StorySceneData
     public Sprite hinhAnhHienThi; // Ảnh 2D của cảnh đó
     [TextArea(3, 10)]
     public string[] loiThoai;     // Các câu thoại trong cảnh đó
+    public AudioClip[] AmThanhLoiThoai; // Audio cho từng câu thoại
 }
 
 public class TriggerStorySequence : MonoBehaviour
@@ -20,6 +21,7 @@ public class TriggerStorySequence : MonoBehaviour
     public GameObject panelChuyenCanh; // Cái Panel to chứa tất cả
     public Image imgHienThi;           // Nơi hiện ảnh 2D
     public Text textHienThi;           // Đã đổi từ TMP_Text sang Text thường
+    public AudioSource nguonPhatAm;    // AudioSource để phát voice
 
     [Header("--- CẤU HÌNH CỐT TRUYỆN ---")]
     // Danh sách 5 scene của bạn sẽ nằm ở đây
@@ -185,6 +187,7 @@ public class TriggerStorySequence : MonoBehaviour
         // Bắt đầu chạy dòng thoại đầu tiên
         if (danhSachCacCanh[index].loiThoai != null && danhSachCacCanh[index].loiThoai.Length > 0)
         {
+            PhatAmThanh(index, 0);
             StartCoroutine(GoChu(danhSachCacCanh[index].loiThoai[0]));
         }
         else
@@ -201,6 +204,7 @@ public class TriggerStorySequence : MonoBehaviour
         // KIỂM TRA 1: Còn thoại trong cảnh này không?
         if (indexThoaiHienTai < danhSachCacCanh[indexCanhHienTai].loiThoai.Length)
         {
+            PhatAmThanh(indexCanhHienTai, indexThoaiHienTai);
             StartCoroutine(GoChu(danhSachCacCanh[indexCanhHienTai].loiThoai[indexThoaiHienTai]));
         }
         else
@@ -300,5 +304,19 @@ public class TriggerStorySequence : MonoBehaviour
         }
         
         Debug.Log($"[TriggerStorySequence] Đã vô hiệu hóa {luQuaiVat.Length} con quái!");
+    }
+
+    void PhatAmThanh(int indexCanh, int indexThoai)
+    {
+        if (nguonPhatAm == null) return;
+        if (danhSachCacCanh[indexCanh].AmThanhLoiThoai == null) return;
+        if (indexThoai >= danhSachCacCanh[indexCanh].AmThanhLoiThoai.Length) return;
+        
+        AudioClip clip = danhSachCacCanh[indexCanh].AmThanhLoiThoai[indexThoai];
+        if (clip != null)
+        {
+            nguonPhatAm.clip = clip;
+            nguonPhatAm.Play();
+        }
     }
 }
