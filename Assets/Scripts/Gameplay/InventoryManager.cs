@@ -1,258 +1,247 @@
-using TMPro; // <--- Thêm dòng này để dùng TextMeshPro
-using UnityEngine.UI;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Video;
+using UnityEngine.UI;
 
 public class InventoryManager : MonoBehaviour
 {
-    public static InventoryManager Instance;
+    // SỬA LỖI Ở ĐÂY: Đổi 'instance' thành 'Instance' (viết hoa chữ I)
+    public static InventoryManager Instance; 
 
-    [Header("UI & Gameplay")]
-    public GameObject[] nutBamUI; // Nút trong túi
-    public GameObject[] doThat3D; // Đồ thật trên người (0:Trước, 1:Sau, 2:Váy, 3:Khăn)
+    [Header("--- UI & Vật phẩm ---")]
+    [Tooltip("Kéo các nút bấm trong Inventory vào đây")]
+    public Button[] NutBamUI;       
+    
+    [Tooltip("Kéo các Mesh quần áo trên người hình nhân vào đây")]
+    public GameObject[] DoThat3D;   
 
-    [Header("Chiến Thắng & Thua")]
-    public GameObject manHinhVideo;
-    public VideoPlayer videoPlayer;
-    public GameObject puzzleCamera; // Camera soi
+    [Header("--- Cấu hình Kết thúc (Mới) ---")]
+    [Tooltip("Kéo GameObject chứa script TriggerStorySequence (Ending) vào đây")]
+    public GameObject StoryEndingObject; 
+    
+    [Tooltip("Camera soi cận cảnh hình nhân")]
+    public GameObject PuzzleCamera;     
 
-    [Header("Sinh Mệnh (Lose Game)")]
-    public TextMeshProUGUI textSinhMenh; // Kéo TextMeshPro vào đây
-    public float thoiGianToiDa = 180f; // 3 phút = 180 giây
-    private float sinhMenh = 100f;
-    private float tocDoGiam; // Tính tự động
-    private bool gameKetThuc = false;
+    [Header("--- Sinh Mệnh & Thua ---")]
+    public Text TextSinhMenh; // Đã đổi từ TextMeshProUGUI sang Text thường
+    public float ThoiGianToiDa = 180;
+    
+    [Tooltip("Kéo màn hình You Lose vào đây")]
+    public GameObject ManHinhThua;
 
-    [Header("Màn hình Thua")]
-    public GameObject manHinhThua; // Panel hiện khi thua (tùy chọn)
+    [Header("--- Cấu hình Khác ---")]
+    public GameObject PlayerFPS;    
+    public GameObject UiInventory;  
 
-    // --- LOGIC THỨ TỰ ---
-    private int buocCanLam = 0;
-    private int soLanSai = 0;
-    private int gioiHanSai = 3;
-
-    // Biến đếm số đồ đã nhặt
-    private int soDoDaNhat = 0;
-    private bool dangOCheDoGhepDo = false;
-
-    [Header("Cấu hình Gameplay")]
-    public GameObject playerFPS;
-    public GameObject uiInventory;
+    // Biến nội bộ
+    private float thoiGianHienTai;
+    private bool[] daMacDung; 
+    private bool isGameActive = true;
 
     void Awake()
     {
+        // Gán Instance bằng this (viết hoa chữ I)
         Instance = this;
-        // Tắt hết đồ thật lúc đầu
-        if (doThat3D != null)
+
+        // Tự động khởi tạo mảng
+        if (NutBamUI != null)
+            daMacDung = new bool[NutBamUI.Length];
+        else
+            daMacDung = new bool[4]; 
+
+        thoiGianHienTai = ThoiGianToiDa;
+
+        // Đảm bảo Story Ending luôn TẮT khi bắt đầu game
+        if (StoryEndingObject != null)
         {
-            foreach (var do3D in doThat3D)
-            {
-                if (do3D != null) do3D.SetActive(false);
-            }
+            StoryEndingObject.SetActive(false);
         }
-    }
-
-    void Start()
-    {
-        // Tính tốc độ giảm: 100 điểm / 180 giây
-        tocDoGiam = 100f / thoiGianToiDa;
-        sinhMenh = 100f;
-        gameKetThuc = false;
-
-        // Tắt màn hình thua nếu có
-        if (manHinhThua != null) manHinhThua.SetActive(false);
-
-        // Cập nhật UI lần đầu
-        CapNhatUISinhMenh();
     }
 
     void Update()
     {
-        // Nếu game đã kết thúc thì không làm gì
-        if (gameKetThuc) return;
+        if (!isGameActive) return;
 
-        // Giảm sinh mệnh theo thời gian
-        sinhMenh -= tocDoGiam * Time.deltaTime;
-
-        // Clamp để không âm
-        if (sinhMenh < 0) sinhMenh = 0;
-
-        // Cập nhật UI
-        CapNhatUISinhMenh();
-
-        // Kiểm tra thua
-        if (sinhMenh <= 0)
+        if (thoiGianHienTai > 0)
         {
-            LoseGame();
-        }
-    }
-
-    void CapNhatUISinhMenh()
-    {
-        if (textSinhMenh != null)
-        {
-            textSinhMenh.text = "Sinh mệnh: " + Mathf.CeilToInt(sinhMenh).ToString();
-        }
-    }
-
-    // --- HÀM NHẶT ĐỒ ---
-    public void NhatDo(int id)
-    {
-        if (gameKetThuc) return;
-
-        if (id < 0 || nutBamUI == null || id >= nutBamUI.Length)
-        {
-            Debug.LogError($"[InventoryManager] ID món đồ không hợp lệ: {id}");
-            return;
-        }
-
-        if (nutBamUI[id] != null && nutBamUI[id].activeSelf)
-        {
-            Debug.LogWarning($"[InventoryManager] Món đồ ID {id} đã được nhặt rồi!");
-            return;
-        }
-
-        if (nutBamUI[id] != null)
-        {
-            nutBamUI[id].SetActive(true);
-            Debug.Log($"[InventoryManager] ✅ Đã nhặt món số: {id}");
-        }
-
-        soDoDaNhat++;
-        Debug.Log($"[InventoryManager] Tổng số đồ đã nhặt: {soDoDaNhat}/4");
-    }
-
-    // --- HÀM KIỂM TRA VÀ ZOOM ---
-    public void KiemTraVaZoom()
-    {
-        if (gameKetThuc) return;
-        if (dangOCheDoGhepDo) return;
-
-        if (soDoDaNhat >= 4)
-        {
-            VaoCheDoGhepDo();
+            thoiGianHienTai -= Time.deltaTime;
+            if (TextSinhMenh != null)
+                TextSinhMenh.text = "Sinh mệnh: " + Mathf.RoundToInt(thoiGianHienTai).ToString();
         }
         else
         {
-            int soDoConThieu = 4 - soDoDaNhat;
-            Debug.Log($"[InventoryManager] ❌ Chưa đủ đồ! Cần tìm thêm {soDoConThieu} món.");
+            TriggerLoseGame();
         }
     }
 
-    void VaoCheDoGhepDo()
+    // Hàm này được gọi từ các script CollectableItem
+    public void CheckItem(int itemID)
     {
-        Debug.Log("[InventoryManager] 🎯 Vào chế độ giải đố!");
-        if (playerFPS != null) playerFPS.SetActive(false);
-        if (puzzleCamera != null) puzzleCamera.SetActive(true);
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-        dangOCheDoGhepDo = true;
+        if (!isGameActive) return;
+
+        // Hiện đồ 3D
+        if (DoThat3D != null && itemID >= 0 && itemID < DoThat3D.Length)
+        {
+            if (DoThat3D[itemID] != null) 
+                DoThat3D[itemID].SetActive(true);
+        }
+
+        // Khóa nút bấm
+        if (NutBamUI != null && itemID >= 0 && itemID < NutBamUI.Length)
+        {
+            if (NutBamUI[itemID] != null) 
+                NutBamUI[itemID].interactable = false;
+        }
+
+        // Đánh dấu hoàn thành
+        if (daMacDung != null && itemID < daMacDung.Length)
+        {
+            daMacDung[itemID] = true;
+        }
+
+        CheckWinCondition();
     }
 
-    // --- HÀM XỬ LÝ DÁN ĐỒ ---
+    // Hàm này được gọi từ CollectableItem khi nhặt đồ
+    public void NhatDo(int idMonDo)
+    {
+        if (!isGameActive) return;
+
+        Debug.Log($"[InventoryManager] Đã nhặt món đồ ID: {idMonDo}");
+
+        // Bật nút bấm tương ứng trong UI
+        if (NutBamUI != null && idMonDo >= 0 && idMonDo < NutBamUI.Length)
+        {
+            if (NutBamUI[idMonDo] != null)
+            {
+                NutBamUI[idMonDo].gameObject.SetActive(true);
+                NutBamUI[idMonDo].interactable = true;
+            }
+        }
+    }
+
+    // Hàm này được gọi từ SmartSticker khi dán đồ đúng vị trí
     public void XuLyDanDo(int idMonDo)
     {
-        if (gameKetThuc) return;
+        if (!isGameActive) return;
 
-        Debug.Log($"Bạn vừa dán món số {idMonDo}. Game đang đợi món số {buocCanLam}");
+        Debug.Log($"[InventoryManager] Đã dán đúng món đồ ID: {idMonDo}");
 
-        if (idMonDo == buocCanLam)
+        // Hiện đồ 3D trên hình nhân
+        if (DoThat3D != null && idMonDo >= 0 && idMonDo < DoThat3D.Length)
         {
-            Debug.Log(">>> CHÍNH XÁC! Bước " + buocCanLam + " hoàn thành.");
+            if (DoThat3D[idMonDo] != null)
+                DoThat3D[idMonDo].SetActive(true);
+        }
 
-            if (doThat3D[idMonDo] != null)
+        // Tắt nút bấm (đã dùng xong)
+        if (NutBamUI != null && idMonDo >= 0 && idMonDo < NutBamUI.Length)
+        {
+            if (NutBamUI[idMonDo] != null)
+                NutBamUI[idMonDo].gameObject.SetActive(false);
+        }
+
+        // Đánh dấu hoàn thành
+        if (daMacDung != null && idMonDo < daMacDung.Length)
+        {
+            daMacDung[idMonDo] = true;
+        }
+
+        CheckWinCondition();
+    }
+
+    // Hàm này được gọi từ ClickToZoom khi click vào hình nhân
+    public void KiemTraVaZoom()
+    {
+        if (!isGameActive) return;
+
+        Debug.Log("[InventoryManager] Đang kiểm tra để zoom vào hình nhân...");
+
+        // Kiểm tra xem đã nhặt đủ đồ chưa
+        bool daNhatDuDo = true;
+        if (NutBamUI != null)
+        {
+            foreach (var nut in NutBamUI)
             {
-                doThat3D[idMonDo].SetActive(true);
+                if (nut != null && !nut.gameObject.activeSelf)
+                {
+                    daNhatDuDo = false;
+                    break;
+                }
             }
+        }
 
-            if (nutBamUI[idMonDo] != null)
-            {
-                nutBamUI[idMonDo].SetActive(false);
-            }
+        if (daNhatDuDo)
+        {
+            // Đã nhặt đủ đồ -> Chuyển sang chế độ puzzle
+            Debug.Log("[InventoryManager] Đã nhặt đủ đồ! Chuyển sang chế độ puzzle...");
+            
+            // Tắt player FPS
+            if (PlayerFPS != null)
+                PlayerFPS.SetActive(false);
 
-            buocCanLam++;
+            // Bật camera puzzle
+            if (PuzzleCamera != null)
+                PuzzleCamera.SetActive(true);
 
-            if (buocCanLam >= 4)
-            {
-                WinGame();
-            }
+            // Mở khóa chuột
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
         else
         {
-            XuLyDanSai();
+            Debug.Log("[InventoryManager] Chưa nhặt đủ đồ! Hãy tìm thêm vật phẩm.");
         }
     }
 
-    void XuLyDanSai()
+    void CheckWinCondition()
     {
-        soLanSai++;
-        Debug.LogWarning($"!!! SAI THỨ TỰ! Bạn còn {gioiHanSai - soLanSai} mạng.");
-
-        if (soLanSai >= gioiHanSai)
+        bool isWin = true;
+        
+        if (daMacDung != null)
         {
-            ResetPuzzle();
+            for (int i = 0; i < daMacDung.Length; i++)
+            {
+                if (!daMacDung[i])
+                {
+                    isWin = false;
+                    break;
+                }
+            }
+        }
+
+        if (isWin)
+        {
+            TriggerWinGame();
         }
     }
 
-    void ResetPuzzle()
+    void TriggerWinGame()
     {
-        Debug.LogError("THUA CUỘC! LÀM LẠI TỪ ĐẦU!");
+        isGameActive = false;
+        Debug.Log("CHIẾN THẮNG! Bắt đầu chạy Story Ending...");
 
-        buocCanLam = 0;
-        soLanSai = 0;
+        if (UiInventory != null) 
+            UiInventory.SetActive(false);
+        
+        if (TextSinhMenh != null) 
+            TextSinhMenh.gameObject.SetActive(false);
 
-        foreach (var do3D in doThat3D)
+        // KÍCH HOẠT STORY ENDING
+        if (StoryEndingObject != null)
         {
-            if (do3D != null) do3D.SetActive(false);
-        }
-
-        foreach (var nut in nutBamUI)
-        {
-            if (nut != null) nut.SetActive(true);
+            StoryEndingObject.SetActive(true); 
         }
     }
 
-    void WinGame()
+    public void TriggerLoseGame()
     {
-        Debug.Log("===== WIN GAME! PHÁT VIDEO! =====");
-        gameKetThuc = true;
+        isGameActive = false;
+        
+        if (ManHinhThua != null) 
+            ManHinhThua.SetActive(true);
 
-        if (puzzleCamera != null) puzzleCamera.SetActive(false);
-
-        if (manHinhVideo != null)
-        {
-            manHinhVideo.SetActive(true);
-            if (videoPlayer != null) videoPlayer.Play();
-        }
-    }
-
-    void LoseGame()
-    {
-        Debug.LogError("===== LOSE GAME! HẾT SINH MỆNH! =====");
-        gameKetThuc = true;
-
-        // Hiện màn hình thua nếu có
-        if (manHinhThua != null)
-        {
-            manHinhThua.SetActive(true);
-        }
-
-        // Tắt camera soi nếu đang bật
-        if (puzzleCamera != null) puzzleCamera.SetActive(false);
-
-        // Hiện con trỏ chuột
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-
-        // Tắt player
-        if (playerFPS != null) playerFPS.SetActive(false);
-    }
-
-    // Hàm public để restart (gọi từ nút Restart nếu có)
-    public void RestartGame()
-    {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(
-            UnityEngine.SceneManagement.SceneManager.GetActiveScene().name
-        );
     }
 }
