@@ -11,6 +11,8 @@ public class GameController : MonoBehaviour
     [Header("Cài đặt UI")]
     public GameObject losePanel; // Kéo Panel chứa chữ "YOU LOSE" vào đây
     public Text loseText; // (Tùy chọn) Kéo Text component vào nếu muốn đổi chữ
+    public Image loseImage; // Ảnh Sprite 2D hiển thị khi thua (toàn màn hình)
+    public Sprite loseSprite; // Sprite ảnh thua để hiển thị
     public float loseDisplayTime = 2f; // Thời gian hiển thị "YOU LOSE" trước khi reload
     
     [Header("Cài đặt Scene Thua")]
@@ -149,6 +151,14 @@ public class GameController : MonoBehaviour
         if (losePanel != null)
         {
             losePanel.SetActive(true);
+            
+            // Hiển thị ảnh Sprite nếu có
+            if (loseImage != null && loseSprite != null)
+            {
+                loseImage.sprite = loseSprite;
+                loseImage.gameObject.SetActive(true);
+            }
+            
             Debug.Log("GameController: LosePanel đã được bật!");
         }
         else
