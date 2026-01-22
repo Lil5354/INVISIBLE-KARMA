@@ -1173,12 +1173,12 @@ MonoBehaviour:
   - {fileID: 1891107982}
   - {fileID: 1397996022}
   - {fileID: 552408338}
-  tocDoGoChu: 0.05
+  tocDoGoChu: 0.03
   danhSachLoiDan:
   - noiDung: "Ng\u01B0\u1EDDi ta th\u01B0\u1EDDng n\xF3i, ngh\u1EC1 ch\u1ECDn ng\u01B0\u1EDDi,
       nh\u01B0ng v\u1EDBi cha t\xF4i... c\xF3 l\u1EBD l\xE0 'nghi\u1EC7p' ch\u1ECDn
       ng\u01B0\u1EDDi."
-    giongDoc: {fileID: 0}
+    giongDoc: {fileID: 8300000, guid: 218eb91a2873c9440b9543d00fcce9bc, type: 3}
     thoiGianCho: 1
   - noiDung: "Cha t\xF4i l\xE0 m\u1ED9t Th\u1EA7y Ph\xE1p. C\u1EA3 \u0111\u1EDDi
       \xF4ng l\u1EA7m l\u0169i trong c\u0103n nh\xE0 g\u1ED7 t\u1ED1i t\u0103m, t\u1EC9
@@ -1193,13 +1193,13 @@ MonoBehaviour:
       r\u01B0\u1EE3u ng\xE2m, m\xF9i nhang kh\xF3i v\xE0... m\u1ED9t m\xF9i tanh
       n\u1ED3ng l\u1EE3m gi\u1ECDng m\xE0 ng\xE0y b\xE9 t\xF4i kh\xF4ng hi\u1EC3u
       l\xE0 g\xEC."
-    giongDoc: {fileID: 0}
+    giongDoc: {fileID: 8300000, guid: 218eb91a2873c9440b9543d00fcce9bc, type: 3}
     thoiGianCho: 1
   - noiDung: "Ng\xE0y t\xF4i r\u1EDDi \u0111i h\u1ECDc \u0111\u1EA1i h\u1ECDc, cha
       d\xFAi v\xE0o tay t\xF4i m\u1ED9t l\xE1 b\xF9a \u0111\u1ECF ch\xF3t, \xE1nh
       m\u1EAFt \xF4ng h\u1EB1n l\xEAn nh\u1EEFng tia m\xE1u \u0111\u1ECF qu\u1EA1ch,
       gi\u1ECDng l\u1EA1c \u0111i nh\u01B0 ng\u01B0\u1EDDi c\xF5i \xE2m:"
-    giongDoc: {fileID: 0}
+    giongDoc: {fileID: 8300000, guid: 218eb91a2873c9440b9543d00fcce9bc, type: 3}
     thoiGianCho: 1
   - noiDung: "'Linh! Nghe cha d\u1EB7n. N\u1EBFu cha s\u1ED1ng qua 80 tu\u1ED5i m\xE0
       m\u1EA5t, con h\xE3y v\u1EC1 lo h\u1EADu s\u1EF1. Nh\u01B0ng n\u1EBFu cha ch\u1EBFt
@@ -1209,16 +1209,16 @@ MonoBehaviour:
       c\xF3 nh\u1EDB th\u01B0\u01A1ng... c\u0169ng c\u1EA5m \u0111\u01B0\u1EE3c b\u01B0\u1EDBc
       ch\xE2n qua c\u1ED5ng l\xE0ng! Ch\u1EA1y \u0111i! Ch\u1EA1y c\xE0ng xa c\xE0ng
       t\u1ED1t!'"
-    giongDoc: {fileID: 0}
+    giongDoc: {fileID: 8300000, guid: 218eb91a2873c9440b9543d00fcce9bc, type: 3}
     thoiGianCho: 1
   - noiDung: "N\u0103m nay... cha t\xF4i m\u1EDBi 58 tu\u1ED5i."
-    giongDoc: {fileID: 0}
+    giongDoc: {fileID: 8300000, guid: 218eb91a2873c9440b9543d00fcce9bc, type: 3}
     thoiGianCho: 1
   - noiDung: "B\u1EE9c th\u01B0 b\xE1o t\u1EED g\u1EEDi \u0111\u1EBFn tay t\xF4i
       s\xE1ng nay ch\u1EC9 v\u1ECFn v\u1EB9n v\xE0i ch\u1EEF ngu\u1EC7ch ngo\u1EA1c:
       'Th\u1EA7y Ph\xE1p ch\u1EBFt r\u1ED3i. M\u1EA5t h\u1EBFt n\u1ED9i t\u1EA1ng.
       V\u1EC1 g\u1EA5p.'"
-    giongDoc: {fileID: 0}
+    giongDoc: {fileID: 8300000, guid: 218eb91a2873c9440b9543d00fcce9bc, type: 3}
     thoiGianCho: 1
   - noiDung: "L\u1EDDi th\u1EC1 n\u0103m x\u01B0a v\u0103ng v\u1EB3ng b\xEAn tai,
       nh\u01B0ng l\xE0m sao con c\xF3 th\u1EC3 kh\xF4ng v\u1EC1 h\u1EA3 cha? M\u1ED9t
@@ -1226,7 +1226,7 @@ MonoBehaviour:
       xin l\u1ED7i. D\xF9 Th\xF4n T\u1ECBch T\xE0 c\xF3 l\xE0 hang h\xF9m mi\u1EC7ng
       s\xF3i, con c\u0169ng ph\u1EA3i v\u1EC1 g\u1EB7p cha... l\u1EA7n cu\u1ED1i
       c\xF9ng.\""
-    giongDoc: {fileID: 0}
+    giongDoc: {fileID: 8300000, guid: 218eb91a2873c9440b9543d00fcce9bc, type: 3}
     thoiGianCho: 1
 --- !u!82 &1518699246
 AudioSource:
@@ -1428,6 +1428,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1891107984}
   - component: {fileID: 1891107983}
+  - component: {fileID: 1891107985}
   m_Layer: 0
   m_Name: SceneDirector
   m_TagString: Untagged
@@ -1450,9 +1451,58 @@ MonoBehaviour:
   nameText: {fileID: 732284592}
   contentText: {fileID: 937937318}
   nameContainer: {fileID: 0}
+  voiceSource: {fileID: 0}
+  sfxSource: {fileID: 0}
+  typingSound: {fileID: 8300000, guid: 18705229368c95f4faa14d268246ea16, type: 3}
+  typingFrequency: 4
   typingSpeed: 0.05
   gameplaySceneName: Chapter1
-  storyLines: []
+  storyLines:
+  - characterName: 
+    content: "Gi\xF3 \u0111\xEAm r\xEDt t\u1EEBng c\u01A1n l\u1EA1nh bu\u1ED1t. Nh\u1EEFng
+      \u0111\u1ED3ng ti\u1EC1n v\xE0ng m\xE3 b\u1ECB cu\u1ED1n bay t\u1EE9 tung,
+      xoay v\xF2ng trong \xE1nh \u0111\xE8n l\u1ED3ng \u0111\u1ECF qu\u1EA1ch nh\u01B0
+      m\u1ED9t \u0111\xE1m tang kh\xF4ng ng\u01B0\u1EDDi."
+    isNarration: 0
+    voiceClip: {fileID: 8300000, guid: 62173ba6238a5854092a44cb87da1dd1, type: 3}
+  - characterName: 
+    content: "Linh b\u01B0\u1EDBc xu\u1ED1ng xe. C\xF4 tuy\u1EC7t v\u1ECDng gi\u01A1
+      cao chi\u1EBFc \u0111i\u1EC7n tho\u1EA1i, nh\u01B0ng d\xF2ng ch\u1EEF 'No Signal'
+      nh\u1EA5p nh\xE1y .."
+    isNarration: 0
+    voiceClip: {fileID: 8300000, guid: 62173ba6238a5854092a44cb87da1dd1, type: 3}
+  - characterName: 'LINH: '
+    content: "Cha \u01A1i... Cu\u1ED1i c\xF9ng con c\u0169ng v\u1EC1 l\u1EA1i n\u01A1i
+      n\xE0y, sao m\u1ECDi th\u1EE9 l\u1EA1i l\u1EA1nh tanh th\u1EBF n\xE0y?....
+      M\u1ECDi ng\u01B0\u1EDDi \u0111i \u0111\xE2u h\u1EBFt r\u1ED3i?"
+    isNarration: 0
+    voiceClip: {fileID: 8300000, guid: fc3122373b3594f4fae17c5c66764d7b, type: 3}
+  - characterName: 
+    content: "Linh \u0111i s\xE2u v\xE0o trong th\xF4n. Kh\xF4ng m\u1ED9t b\xF3ng
+      ng\u01B0\u1EDDi s\u1ED1ng. C\u1EEDa c\xE1c ng\xF4i nh\xE0 g\u1ED7 \u0111\u1EC1u
+      \u0111\xF3ng im \u1EC9m, then c\xE0i ch\u1EB7t nh\u01B0 s\u1EE3 h\xE3i m\u1ED9t
+      th\u1EE9 g\xEC \u0111\xF3 t\u1EEB b\xEAn ngo\xE0i"
+    isNarration: 0
+    voiceClip: {fileID: 8300000, guid: 62173ba6238a5854092a44cb87da1dd1, type: 3}
+  - characterName: 
+    content: "...Ch\u1EC9 c\xF3 nh\u1EEFng h\xE0ng m\xE3 \u0111\u01B0\u1EE3c b\xE0y
+      la li\u1EC7t. Ng\u1EF1a gi\u1EA5y, xe tang, v\xE0 nh\u1EEFng h\xECnh nh\xE2n
+      th\u1EBF m\u1EA1ng \u0111\u1EE9ng r\u0169 r\u01B0\u1EE3i... \u0111\xF4i m\u1EAFt
+      ch\u1EA5m m\u1EF1c \u0111en v\xF4 h\u1ED3n nh\u01B0 \u0111ang d\xF5i theo t\u1EEBng
+      b\u01B0\u1EDBc ch\xE2n c\u1EE7a c\xF4."
+    isNarration: 0
+    voiceClip: {fileID: 8300000, guid: 9c93311c296bbdc428f227b8e1493d55, type: 3}
+  - characterName: 
+    content: "S\u1EF1 im l\u1EB7ng bao tr\xF9m \u0111\u1EBFn m\u1EE9c Linh c\xF3
+      th\u1EC3 nghe th\u1EA5y ti\u1EBFng tim m\xECnh \u0111\u1EADp th\xECnh th\u1ECBch"
+    isNarration: 0
+    voiceClip: {fileID: 8300000, guid: c774cd60e15af9643840d8d85e41362d, type: 3}
+  - characterName: 
+    content: "Ph\xEDa tr\u01B0\u1EDBc l\xE0 R\u1EEBng Tr\xFAc. \xC1nh tr\u0103ng
+      r\u1EB1m soi r\xF5 con \u0111\u01B0\u1EDDng \u0111\u1ED9c \u0111\u1EA1o...
+      C\xF4 b\u1EAFt bu\u1ED9c ph\u1EA3i \u0111i qua n\xF3."
+    isNarration: 0
+    voiceClip: {fileID: 8300000, guid: 62173ba6238a5854092a44cb87da1dd1, type: 3}
 --- !u!4 &1891107984
 Transform:
   m_ObjectHideFlags: 0
@@ -1468,6 +1518,102 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &1891107985
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1891107982}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 36b579b87fd1ed44caf7f2e879771e07, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 0.404
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

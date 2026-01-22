@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI; // Đã đổi từ TMPro sang UI thường
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 [System.Serializable]
@@ -11,28 +11,38 @@ public class StoryLine
     [TextArea(3, 10)]
     public string content;       // Nội dung thoại/mô tả
     public bool isNarration;     // Tích vào nếu đây là đoạn mô tả không khí
+
+    [Header("Âm thanh (Tùy chọn)")]
+    [Tooltip("Kéo file ghi âm giọng đọc hoặc tiếng động cho đoạn này vào đây")]
+    public AudioClip voiceClip;  // <-- THÊM MỚI: File âm thanh cho từng câu
 }
 
 public class Scene1Manager : MonoBehaviour
 {
     [Header("UI References")]
-    [Tooltip("Text hiển thị tên nhân vật")]
-    public Text nameText;  // Đã đổi từ TextMeshProUGUI sang Text
-    
-    [Tooltip("Text hiển thị nội dung thoại/mô tả")]
-    public Text contentText;  // Đã đổi từ TextMeshProUGUI sang Text
-    
-    [Tooltip("Cái khung chứa tên (để tắt đi khi dẫn truyện) - Tùy chọn")]
-    public GameObject nameContainer; // Cái khung chứa tên (để tắt đi khi dẫn truyện)
+    public Text nameText;
+    public Text contentText;
+    public GameObject nameContainer;
 
-    [Header("Cài đặt")]
-    [Tooltip("Tốc độ gõ chữ (giây/ ký tự) - Số càng nhỏ càng nhanh")]
-    public float typingSpeed = 0.05f; // Tốc độ chữ chạy
-    
-    [Tooltip("Tên scene gameplay để chuyển khi hết scene 1")]
+    [Header("--- CẤU HÌNH ÂM THANH ---")]
+    [Tooltip("Nguồn phát giọng đọc (Voice) - Sẽ tự động tạo nếu chưa gán")]
+    public AudioSource voiceSource;
+
+    [Tooltip("Nguồn phát tiếng gõ phím (SFX) - Sẽ tự động tạo nếu chưa gán")]
+    public AudioSource sfxSource;
+
+    [Tooltip("File âm thanh tiếng gõ lách cách (nếu muốn)")]
+    public AudioClip typingSound;
+
+    [Tooltip("Tần suất phát tiếng gõ (ví dụ: 2 ký tự kêu 1 lần cho đỡ ồn)")]
+    [Range(1, 10)]
+    public int typingFrequency = 10;
+
+    [Header("Cài đặt Game")]
+    public float typingSpeed = 0.05f;
     public string gameplaySceneName = "Chapter1";
 
-    [Header("Nội dung kịch bản (Nhập ở đây hoặc Inspector)")]
+    [Header("Nội dung kịch bản")]
     public List<StoryLine> storyLines = new List<StoryLine>();
 
     private int index = 0;
@@ -40,33 +50,42 @@ public class Scene1Manager : MonoBehaviour
 
     void Start()
     {
-        // TỰ ĐỘNG NẠP DỮ LIỆU CỐT TRUYỆN CỦA BẠN VÀO ĐÂY
-        // (Hoặc bạn có thể xóa đoạn này và nhập tay ngoài Inspector cho dễ sửa)
-        
-        // Chỉ load data nếu list rỗng (cho phép nhập từ Inspector)
+        // 1. Tự động tạo AudioSource nếu bạn quên kéo vào
+        if (voiceSource == null)
+        {
+            voiceSource = gameObject.AddComponent<AudioSource>();
+            voiceSource.playOnAwake = false;
+        }
+
+        if (sfxSource == null)
+        {
+            sfxSource = gameObject.AddComponent<AudioSource>();
+            sfxSource.playOnAwake = false;
+        }
+
+        // Đảm bảo không lặp lại giọng đọc
+        voiceSource.loop = false;
+        sfxSource.loop = false;
+
+        // 2. Load dữ liệu mẫu nếu list rỗng
         if (storyLines.Count == 0)
         {
             LoadStoryData();
         }
-        
-        // Kiểm tra UI references
+
+        // 3. Kiểm tra UI
         if (nameText == null || contentText == null)
         {
-            Debug.LogError("[Scene1Manager] ⚠️ Thiếu UI References! Hãy kéo TextMeshPro components vào Inspector.");
+            Debug.LogError("[Scene1Manager] ⚠️ Thiếu UI References!");
             return;
         }
-        
-        // Bắt đầu phát dòng đầu tiên
+
+        // 4. Bắt đầu dòng đầu tiên
         if (storyLines.Count > 0)
         {
             StartCoroutine(PlayLine(storyLines[index]));
         }
-        else
-        {
-            Debug.LogWarning("[Scene1Manager] ⚠️ Không có nội dung kịch bản!");
-        }
-        
-        // Mở khóa cursor
+
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
@@ -78,7 +97,7 @@ public class Scene1Manager : MonoBehaviour
         {
             if (isTyping)
             {
-                // Nếu đang gõ mà bấm -> Hiện hết luôn (Skip)
+                // SKIP: Hiện hết chữ ngay lập tức
                 StopAllCoroutines();
                 contentText.text = storyLines[index].content;
                 isTyping = false;
@@ -86,7 +105,7 @@ public class Scene1Manager : MonoBehaviour
             }
             else
             {
-                // Nếu gõ xong rồi -> Chuyển câu tiếp theo
+                // NEXT: Chuyển câu tiếp theo
                 NextLine();
             }
         }
@@ -94,6 +113,9 @@ public class Scene1Manager : MonoBehaviour
 
     void NextLine()
     {
+        // QUAN TRỌNG: Ngắt giọng đọc cũ khi chuyển sang câu mới
+        if (voiceSource.isPlaying) voiceSource.Stop();
+
         index++;
         if (index < storyLines.Count)
         {
@@ -101,130 +123,120 @@ public class Scene1Manager : MonoBehaviour
         }
         else
         {
-            Debug.Log("═══════════════════════════════════════");
-            Debug.Log($"[Scene1Manager] ✅ HẾT SCENE 1 -> Chuyển sang Scene Gameplay: {gameplaySceneName}");
-            Debug.Log("═══════════════════════════════════════");
-            
-            // Chuyển sang scene gameplay
+            Debug.Log("[Scene1Manager] ✅ HẾT SCENE 1 -> Chuyển Scene");
             LoadGameplayScene();
         }
     }
-    
-    /// <summary>
-    /// Chuyển sang scene gameplay
-    /// </summary>
+
     void LoadGameplayScene()
     {
-        if (string.IsNullOrEmpty(gameplaySceneName))
-        {
-            Debug.LogError("[Scene1Manager] ❌ Chưa cấu hình tên scene gameplay!");
-            return;
-        }
-        
-        // Kiểm tra scene có tồn tại không
+        if (string.IsNullOrEmpty(gameplaySceneName)) return;
+
+        // Kiểm tra an toàn trước khi load
         bool sceneExists = false;
         for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
         {
             string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
-            string sceneName = System.IO.Path.GetFileNameWithoutExtension(scenePath);
-            if (sceneName == gameplaySceneName)
+            if (System.IO.Path.GetFileNameWithoutExtension(scenePath) == gameplaySceneName)
             {
                 sceneExists = true;
-                Debug.Log($"[Scene1Manager] ✅ Tìm thấy scene '{gameplaySceneName}' trong Build Settings (Index: {i})");
                 break;
             }
         }
-        
-        if (!sceneExists)
-        {
-            Debug.LogError($"[Scene1Manager] ❌ KHÔNG TÌM THẤY SCENE '{gameplaySceneName}' TRONG BUILD SETTINGS!");
-            Debug.LogError($"[Scene1Manager] ❌ Vui lòng thêm scene '{gameplaySceneName}' vào File -> Build Settings -> Add Open Scenes");
-            return;
-        }
-        
-        SceneManager.LoadScene(gameplaySceneName);
-        Debug.Log($"[Scene1Manager] ✅ Đã chuyển sang scene: {gameplaySceneName}");
+
+        if (sceneExists) SceneManager.LoadScene(gameplaySceneName);
+        else Debug.LogError($"[Scene1Manager] ❌ Không tìm thấy scene '{gameplaySceneName}'!");
     }
 
     IEnumerator PlayLine(StoryLine line)
     {
         isTyping = true;
-        contentText.text = ""; // Xóa trắng
+        contentText.text = "";
 
-        // Xử lý hiển thị Tên
+        // --- XỬ LÝ UI ---
         if (line.isNarration || string.IsNullOrEmpty(line.characterName))
         {
             nameText.text = "";
-            
-            // Nếu có khung tên riêng thì tắt nó đi
-            if (nameContainer != null)
-            {
-                nameContainer.SetActive(false);
-            }
-            
-            // Chữ nghiêng cho lời dẫn (Text thường dùng FontStyle)
+            if (nameContainer != null) nameContainer.SetActive(false);
             contentText.fontStyle = FontStyle.Italic;
-            Debug.Log($"[Scene1Manager] 📖 Dẫn truyện: {line.content.Substring(0, Mathf.Min(30, line.content.Length))}...");
         }
         else
         {
             nameText.text = line.characterName;
-            
-            // Bật khung tên nếu có
-            if (nameContainer != null)
-            {
-                nameContainer.SetActive(true);
-            }
-            
-            // Chữ bình thường cho lời thoại
+            if (nameContainer != null) nameContainer.SetActive(true);
             contentText.fontStyle = FontStyle.Normal;
-            Debug.Log($"[Scene1Manager] 💬 {line.characterName}: {line.content.Substring(0, Mathf.Min(30, line.content.Length))}...");
         }
 
-        // Hiệu ứng gõ máy chữ
+        // --- XỬ LÝ ÂM THANH (VOICE) ---
+        // Nếu dòng này có file âm thanh thì phát
+        if (line.voiceClip != null && voiceSource != null)
+        {
+            voiceSource.clip = line.voiceClip;
+            voiceSource.Play();
+        }
+
+        // --- HIỆU ỨNG GÕ CHỮ & TIẾNG LÁCH CÁCH ---
+        int charCount = 0;
         foreach (char letter in line.content.ToCharArray())
         {
             contentText.text += letter;
+            charCount++;
+
+            // Phát tiếng gõ phím (nếu có setup)
+            if (sfxSource != null && typingSound != null && charCount % typingFrequency == 0)
+            {
+                // Random nhẹ cao độ để nghe tự nhiên hơn
+                sfxSource.pitch = Random.Range(0.95f, 1.05f);
+                sfxSource.PlayOneShot(typingSound);
+            }
+
             yield return new WaitForSeconds(typingSpeed);
         }
 
         isTyping = false;
-        Debug.Log("[Scene1Manager] ✅ Đã hiển thị xong dòng này. Nhấn Space/Click để tiếp tục...");
     }
 
+    // Hàm này chỉ chạy 1 lần đầu để tạo khung dữ liệu
+    // Sau khi chạy xong, bạn nên chỉnh sửa list StoryLines trong Inspector để gán Audio Clip
     // Hàm này nạp cứng nội dung bạn gửi (Code-driven)
     void LoadStoryData()
     {
         storyLines.Clear();
-        
-        storyLines.Add(new StoryLine { 
-            isNarration = true, 
+
+        storyLines.Add(new StoryLine
+        {
+            isNarration = true,
             content = "Gió đêm rít từng cơn lạnh buốt. Những đồng tiền vàng mã bị cuốn bay tứ tung, xoay vòng trong ánh đèn lồng đỏ quạch như một đám tang không người."
         });
 
-        storyLines.Add(new StoryLine { 
-            isNarration = true, 
+        storyLines.Add(new StoryLine
+        {
+            isNarration = true,
             content = "Linh bước xuống xe. Cô tuyệt vọng giơ cao chiếc điện thoại, nhưng dòng chữ 'No Signal' nhấp nháy .."
         });
 
-        storyLines.Add(new StoryLine { 
-            characterName = "LINH", 
-            content = "Cha ơi... Cuối cùng con cũng về lại nơi này, sao mọi thứ lại lạnh tanh thế này?.... Mọi người đi đâu hết rồi?" 
+        storyLines.Add(new StoryLine
+        {
+            characterName = "LINH",
+            content = "Cha ơi... Cuối cùng con cũng về lại nơi này, sao mọi thứ lại lạnh tanh thế này?.... Mọi người đi đâu hết rồi?"
         });
 
-        storyLines.Add(new StoryLine { 
-            isNarration = true, 
+        storyLines.Add(new StoryLine
+        {
+            isNarration = true,
             content = "Linh đi sâu vào trong thôn. Không một bóng người sống. Cửa các ngôi nhà gỗ đều đóng im ỉm, then cài chặt như sợ hãi một thứ gì đó từ bên ngoài"
         });
 
-        storyLines.Add(new StoryLine { 
-            isNarration = true, 
+        storyLines.Add(new StoryLine
+        {
+            isNarration = true,
             content = "...Chỉ có những hàng mã được bày la liệt. Ngựa giấy, xe tang, và những hình nhân thế mạng đứng rũ rượi... đôi mắt chấm mực đen vô hồn như đang dõi theo từng bước chân của cô."
         });
 
-        storyLines.Add(new StoryLine { 
-            isNarration = true, 
-            content = "Sự im lặng bao trùm đến mức Linh có thể nghe thấy tiếng tim mình đập thình thịch." 
+        storyLines.Add(new StoryLine
+        {
+            isNarration = true,
+            content = "Sự im lặng bao trùm đến mức Linh có thể nghe thấy tiếng tim mình đập thình thịch."
         });
         storyLines.Add(new StoryLine
         {
@@ -234,31 +246,21 @@ public class Scene1Manager : MonoBehaviour
 
         Debug.Log($"[Scene1Manager] ✅ Đã load {storyLines.Count} dòng kịch bản từ code");
     }
-    
-    /// <summary>
-    /// Reset về dòng đầu tiên (có thể gọi từ button UI)
-    /// </summary>
+
     public void ResetStory()
     {
         index = 0;
         StopAllCoroutines();
+        if (voiceSource.isPlaying) voiceSource.Stop(); // Reset cả âm thanh
         isTyping = false;
         StartCoroutine(PlayLine(storyLines[index]));
-        Debug.Log("[Scene1Manager] Đã reset về dòng đầu tiên");
     }
-    
-    /// <summary>
-    /// Skip toàn bộ và chuyển scene ngay (có thể gọi từ button UI)
-    /// </summary>
+
     public void SkipToGameplay()
     {
         StopAllCoroutines();
-        isTyping = false;
+        if (voiceSource.isPlaying) voiceSource.Stop();
         LoadGameplayScene();
-        Debug.Log("[Scene1Manager] Đã skip toàn bộ scene 1");
     }
 }
-
-
-
 

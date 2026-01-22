@@ -2449,7 +2449,7 @@ MonoBehaviour:
   panelChuyenCanh: {fileID: 2035205242}
   imgHienThi: {fileID: 2125595909}
   textHienThi: {fileID: 1386043150}
-  nguonPhatAm: {fileID: 0}
+  nguonPhatAm: {fileID: 1842983758}
   danhSachCacCanh:
   - tenCanh: 
     hinhAnhHienThi: {fileID: 21300000, guid: c869eebbcf3091247b0b92aa2403091c, type: 3}
@@ -2459,7 +2459,8 @@ MonoBehaviour:
       Nghi th\u1EE9c con v\u1EEBa l\xE0m kh\xF4ng ph\u1EA3i \u0111\u1EC3 si\xEAu
       tho\xE1t, m\xE0 l\xE0 ch\xECa kh\xF3a gi\u1EA3i ph\xF3ng cho 'Song Sinh Luy\u1EC7n
       C\u1ED1t' n\u0103m x\u01B0a..."
-    AmThanhLoiThoai: []
+    AmThanhLoiThoai:
+    - {fileID: 8300000, guid: cb4279555f0ca7745a6669e10ac5ecb3, type: 3}
   - tenCanh: 
     hinhAnhHienThi: {fileID: 21300000, guid: 2a62ddec102ce9348986395f2855890c, type: 3}
     loiThoai:
@@ -2469,27 +2470,32 @@ MonoBehaviour:
       gi\u1EEF ch\xFAng th\xEAm m\u1ED9t v\xF2ng hoa gi\xE1p. V\xEC th\u1EBF b\u1ED1
       m\u1EDBi ra \u0111i \u1EDF tu\u1ED5i 58... ch\u1EE9 kh\xF4ng th\u1EC3 \u0111\u1EE3i
       \u0111\u1EBFn 80."
-    AmThanhLoiThoai: []
+    AmThanhLoiThoai:
+    - {fileID: 8300000, guid: 8c51b9f7eda657a45a7644e499f3c240, type: 3}
   - tenCanh: 
     hinhAnhHienThi: {fileID: 21300000, guid: 4ca4c26353fe86f44951fd40a52d8725, type: 3}
     loiThoai:
     - "Phong \u1EA5n \u0111\xE3 v\u1EE1... T\u1EA1i sao l\u1EA1i c\xF3 m\xF9i b\xF9n
       tanh? S\xE0n nh\xE0... \u0111ang bi\u1EBFn th\xE0nh \u0111\u1EA7m l\u1EA7y
       sao?"
-    AmThanhLoiThoai: []
+    AmThanhLoiThoai:
+    - {fileID: 8300000, guid: dd8254d0e1d8a9f4dbc4ea04556e8f32, type: 3}
   - tenCanh: 
     hinhAnhHienThi: {fileID: 21300000, guid: a753d7c4c2bfd58409110dc98adf34d4, type: 3}
     loiThoai:
     - "T\xECm th\u1EA5y ch\u1ECB r\u1ED3i... Xu\u1ED1ng \u0111\xE2y ch\u01A1i v\u1EDBi
       t\u1EE5i em... Xu\u1ED1ng \u0111\xE1y s\xF4ng l\u1EA1nh l\u1EBDo n\xE0y.."
-    AmThanhLoiThoai: []
+    AmThanhLoiThoai:
+    - {fileID: 8300000, guid: afab7f43ed1a02a4b90f4f270deca88c, type: 3}
   - tenCanh: 
     hinhAnhHienThi: {fileID: 21300000, guid: ae06223f445c7c949908d3f64333e9cc, type: 3}
     loiThoai:
     - "Mu\u1ED1n t\xECm v\u1EADt tr\u1EA5n, ph\u1EA3i l\u1EB7n xu\u1ED1ng \u0111\xE1y
-      oan khi\xEAn..."
+      s\xF4ng s\xE2u..."
     - TO BE CONTINUED
-    AmThanhLoiThoai: []
+    AmThanhLoiThoai:
+    - {fileID: 8300000, guid: 0cd194c66f01d1f4aa18eb278ba19888, type: 3}
+    - {fileID: 8300000, guid: 218eb91a2873c9440b9543d00fcce9bc, type: 3}
   tenSceneTiepTheo: Chapter2
   tocDoGoChu: 0.04
   scriptsCanKhoa: []
@@ -2508,7 +2514,8 @@ Transform:
   m_LocalPosition: {x: 292.45374, y: 299.69907, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1842983759}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &900690433 stripped
@@ -5113,6 +5120,134 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1787254053}
   m_CullTransparentMesh: 1
+--- !u!1 &1842983757
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1842983759}
+  - component: {fileID: 1842983758}
+  m_Layer: 0
+  m_Name: Audio Source
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!82 &1842983758
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1842983757}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!4 &1842983759
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1842983757}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 890230292}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1846406366
 GameObject:
   m_ObjectHideFlags: 0
@@ -5837,7 +5972,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.21960786, g: 0.21960786, b: 0.21960786, a: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

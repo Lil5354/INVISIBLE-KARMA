@@ -1,263 +1,232 @@
 using UnityEngine;
 using System.Collections;
-using UnityEngine.UI; // Đã đổi từ TMPro sang UI thường
-using UnityEngine.SceneManagement; // Để chuyển cảnh sau khi ngất
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Script đạo diễn các sự kiện trong Rừng Trúc (Scene 3D)
 /// Quản lý: Độc thoại, Jumpscare, và Cảnh truy đuổi
+/// Đã tích hợp hệ thống Âm thanh (Voice + SFX)
 /// </summary>
 public class ForestEventDirector : MonoBehaviour
 {
-    [Header("UI Hội thoại")]
+    [Header("--- UI HỘI THOẠI ---")]
     [Tooltip("Panel chứa subtitle (DialoguePanel)")]
     public GameObject dialoguePanel;
-    
-    [Tooltip("Text hiển thị lời thoại (đã đổi từ TextMeshPro sang Text thường)")]
+
+    [Tooltip("Text hiển thị lời thoại")]
     public Text dialogueText;
 
-    [Header("Diễn viên (Models)")]
+    [Header("--- DIỄN VIÊN (MODELS) ---")]
     [Tooltip("Hình nhân áo vàng (ban đầu setActive = false)")]
-    public GameObject yellowPaperDoll; // Hình nhân áo vàng (ban đầu setActive là false hoặc ẩn trong bụi)
-    
+    public GameObject yellowPaperDoll;
+
     [Tooltip("Vị trí giữa đường nơi hình nhân sẽ nhảy ra")]
-    public Transform jumpScarePosition; // Vị trí giữa đường nó sẽ nhảy ra
-    
-    [Tooltip("Group chứa hàng trăm hình nhân ở cuối đường (ban đầu ẩn)")]
-    public GameObject hordeOfDolls; // Một cục (Group) chứa hàng trăm hình nhân ở cuối đường (ban đầu ẩn)
+    public Transform jumpScarePosition;
 
-    [Header("Âm thanh (SFX)")]
-    [Tooltip("AudioSource để phát âm thanh")]
-    public AudioSource audioSource;
-    
+    [Tooltip("Group chứa hàng trăm hình nhân ở cuối đường")]
+    public GameObject hordeOfDolls;
+
+    [Header("--- CẤU HÌNH AUDIO SOURCE ---")]
+    [Tooltip("Nguồn phát tiếng động (SFX) - Dùng AudioSource 1")]
+    public AudioSource sfxSource;
+
+    [Tooltip("Nguồn phát giọng nói (Voice) - Dùng AudioSource 2")]
+    public AudioSource voiceSource;
+
+    [Header("--- AUDIO CLIPS (SỰ KIỆN) ---")]
     [Tooltip("Tiếng quạt mở 'PHẠCH'")]
-    public AudioClip sfxFanOpen; // Tiếng quạt "PHẠCH"
-    
+    public AudioClip sfxFanOpen;
+
     [Tooltip("Tiếng giấy sột soạt")]
-    public AudioClip sfxPaperRustle; // Tiếng giấy sột soạt
-    
+    public AudioClip sfxPaperRustle;
+
     [Tooltip("Tiếng hét của Linh")]
-    public AudioClip sfxScream; // Tiếng hét Linh
-    
+    public AudioClip sfxScream;
+
     [Tooltip("Tiếng chân chạy rầm rập")]
-    public AudioClip sfxChaseRun; // Tiếng chân chạy rầm rập
+    public AudioClip sfxChaseRun;
 
-    [Header("Hiệu ứng màn hình")]
-    [Tooltip("Image đen che toàn màn hình (để fade out)")]
-    public Image blackScreen; // Tấm ảnh đen che toàn màn hình (để fade out)
+    [Header("--- AUDIO CLIPS (THOẠI) ---")]
+    [Tooltip("Thoại 1: Từ nhỏ đã có một điều luật...")]
+    public AudioClip voiceLine1;
+    [Tooltip("Thoại 2: Chỉ là giấy bồi thôi...")]
+    public AudioClip voiceLine2;
+    [Tooltip("Thoại 3: Bình tĩnh...")]
+    public AudioClip voiceLine3;
+    [Tooltip("Thoại 4: Ai đó?!?")]
+    public AudioClip voiceLine4;
+    [Tooltip("Thoại 5: Chúng không đuổi theo mình...")]
+    public AudioClip voiceLine5;
+    [Tooltip("Tiếng la hét cuối cùng (Voice)")]
+    public AudioClip voiceScreamEnd;
 
-    [Header("Cài đặt")]
-    [Tooltip("Tên scene tiếp theo sau khi fade out (để trống nếu không chuyển)")]
-    public string nextSceneName = ""; // Tên scene tiếp theo
-    
-    [Tooltip("Tự động bắt đầu Event 1 khi Start")]
+    [Header("--- HIỆU ỨNG MÀN HÌNH ---")]
+    public Image blackScreen;
+
+    [Header("--- CÀI ĐẶT ---")]
+    public string nextSceneName = "";
     public bool autoStartEvent1 = true;
 
-    // Biến kiểm tra để sự kiện chỉ chạy 1 lần
+    // Biến trạng thái
     private bool event1Triggered = false;
     private bool event2Triggered = false;
     private bool event3Triggered = false;
-    
-    private Coroutine currentSubtitleCoroutine; // Để có thể dừng subtitle cũ
+
+    private Coroutine currentSubtitleCoroutine;
 
     void Start()
     {
-        Debug.Log("[ForestEventDirector] Script đã được khởi tạo");
-        
-        // Kiểm tra UI references
-        if (dialoguePanel == null || dialogueText == null)
-        {
-            Debug.LogWarning("[ForestEventDirector] ⚠️ Thiếu UI References! Hãy kéo DialoguePanel và DialogueText vào Inspector.");
-        }
-        
-        // Ẩn các diễn viên chưa cần thiết
-        if (yellowPaperDoll != null)
-        {
-            yellowPaperDoll.SetActive(false);
-            Debug.Log("[ForestEventDirector] Đã ẩn hình nhân áo vàng");
-        }
-        
-        if (hordeOfDolls != null)
-        {
-            hordeOfDolls.SetActive(false);
-            Debug.Log("[ForestEventDirector] Đã ẩn bầy hình nhân");
-        }
-        
-        // Khởi tạo màn hình đen (trong suốt)
-        if (blackScreen != null)
-        {
-            blackScreen.color = new Color(0, 0, 0, 0); // Trong suốt
-            blackScreen.gameObject.SetActive(false);
-        }
-        
-        // Ẩn dialogue panel lúc đầu
-        if (dialoguePanel != null)
-        {
-            dialoguePanel.SetActive(false);
-        }
-        
-        // Bắt đầu sự kiện 1 ngay khi vào game (hoặc bạn có thể dùng Trigger)
+        // 1. Tự động tìm và CẤU HÌNH AudioSource
+        if (sfxSource == null) sfxSource = GetComponent<AudioSource>();
+        if (voiceSource == null) voiceSource = sfxSource;
+
+        // --- SỬA LỖI LẶP LẠI Ở ĐÂY ---
+        if (sfxSource != null) sfxSource.loop = false;   // Ép tắt Loop cho SFX
+        if (voiceSource != null) voiceSource.loop = false; // Ép tắt Loop cho Giọng nói
+
+        // 2. Setup ban đầu
+        SetupInitialState();
+
+        // 3. Bắt đầu sự kiện 1
         if (autoStartEvent1)
         {
             StartCoroutine(Event1_Monologue());
         }
     }
 
+    void SetupInitialState()
+    {
+        if (yellowPaperDoll != null) yellowPaperDoll.SetActive(false);
+        if (hordeOfDolls != null) hordeOfDolls.SetActive(false);
+
+        if (blackScreen != null)
+        {
+            blackScreen.color = new Color(0, 0, 0, 0);
+            blackScreen.gameObject.SetActive(false);
+        }
+
+        if (dialoguePanel != null) dialoguePanel.SetActive(false);
+    }
+
     /// <summary>
-    /// SỰ KIỆN 1: Độc thoại của Linh (tự động chạy khi Start)
+    /// Hàm tiện ích: Phát SFX (dùng PlayOneShot để chồng âm thanh)
+    /// </summary>
+    public void PlaySFX(AudioClip clip)
+    {
+        if (clip != null && sfxSource != null)
+        {
+            sfxSource.PlayOneShot(clip);
+        }
+    }
+
+    /// <summary>
+    /// SỰ KIỆN 1: Độc thoại của Linh
     /// </summary>
     IEnumerator Event1_Monologue()
     {
-        if (event1Triggered)
-        {
-            Debug.LogWarning("[ForestEventDirector] Event 1 đã được trigger rồi!");
-            yield break;
-        }
-        
+        if (event1Triggered) yield break;
         event1Triggered = true;
-        Debug.Log("[ForestEventDirector] 🎬 Bắt đầu Event 1: Độc thoại");
-        
-        yield return new WaitForSeconds(2f); // Đợi 2s sau khi vào game
-        ShowSubtitle("Từ nhỏ đã có một điều luật bất li thân. Đi qua rừng trúc phải luôn bật sáng đèn...", 4f);
 
-        yield return new WaitForSeconds(4.5f);
-        ShowSubtitle("(Thở dốc) Chỉ là giấy bồi thôi... Khung tre, hồ dán... Không có sự sống...", 4f);
-        yield return new WaitForSeconds(4.5f);
-        
-        ShowSubtitle("Bình tĩnh... Mày là kiến trúc sư mà...", 3f);
+        yield return new WaitForSeconds(2f);
+
+        // Câu 1
+        ShowSubtitle("Từ nhỏ đã có một điều luật bất li thân. Đi qua rừng trúc phải luôn bật sáng đèn...", 4f, voiceLine1);
+        yield return new WaitForSeconds(7f);
+
+        // Câu 2
+        ShowSubtitle("(Thở dốc) Chỉ là giấy bồi thôi... Khung tre, hồ dán... Không có sự sống...", 4f, voiceLine2);
+        yield return new WaitForSeconds(5.5f);
+
+        // Câu 3
+        ShowSubtitle("Bình tĩnh... Mày là kiến trúc sư mà...", 3f, voiceLine3);
         yield return new WaitForSeconds(3.5f);
-        
+
         Debug.Log("[ForestEventDirector] ✅ Event 1 hoàn thành");
     }
 
     /// <summary>
     /// SỰ KIỆN 2: Hình nhân áo vàng Jumpscare
-    /// Hàm này sẽ được gọi từ EventTrigger khi Player đi đến giữa đường
     /// </summary>
     public void TriggerEvent2_YellowDoll()
     {
-        if (event2Triggered)
-        {
-            Debug.LogWarning("[ForestEventDirector] Event 2 đã được trigger rồi!");
-            return;
-        }
-        
-        Debug.Log("[ForestEventDirector] 🎬 Bắt đầu Event 2: Jumpscare hình nhân áo vàng");
+        if (event2Triggered) return;
         StartCoroutine(PlayEvent2());
     }
 
     IEnumerator PlayEvent2()
     {
         event2Triggered = true;
-        
-        // 1. Tiếng sột soạt dữ dội
-        if (audioSource != null && sfxPaperRustle != null)
-        {
-            audioSource.PlayOneShot(sfxPaperRustle);
-            Debug.Log("[ForestEventDirector] 🔊 Phát tiếng giấy sột soạt");
-        }
-        
+
+        // 1. Tiếng sột soạt
+        PlaySFX(sfxPaperRustle);
+        Debug.Log("[ForestEventDirector] 🔊 Tiếng giấy sột soạt");
+
         yield return new WaitForSeconds(0.5f);
 
-        // 2. Hình nhân áo vàng xuất hiện giữa đường
+        // 2. Hình nhân xuất hiện & Quay mặt
         if (yellowPaperDoll != null && jumpScarePosition != null)
         {
             yellowPaperDoll.SetActive(true);
             yellowPaperDoll.transform.position = jumpScarePosition.position;
-            
-            // Quay mặt vào người chơi (Camera)
+
             Camera mainCamera = Camera.main;
             if (mainCamera != null)
             {
                 Vector3 lookDirection = mainCamera.transform.position - yellowPaperDoll.transform.position;
-                lookDirection.y = 0; // Chỉ quay ngang
-                if (lookDirection != Vector3.zero)
-                {
-                    yellowPaperDoll.transform.rotation = Quaternion.LookRotation(lookDirection);
-                }
+                lookDirection.y = 0;
+                yellowPaperDoll.transform.rotation = Quaternion.LookRotation(lookDirection);
             }
-            
-            Debug.Log("[ForestEventDirector] 👻 Hình nhân áo vàng đã xuất hiện!");
-        }
-        else
-        {
-            Debug.LogWarning("[ForestEventDirector] ⚠️ Thiếu yellowPaperDoll hoặc jumpScarePosition!");
         }
 
-        // 3. Linh hét lên
-        ShowSubtitle("Ai đó?!?", 2f);
+        // 3. Linh hét lên "Ai đó?!?"
+        ShowSubtitle("Ai đó?!?", 2f, voiceLine4);
         yield return new WaitForSeconds(1f);
 
         // 4. Tiếng quạt mở PHẠCH
-        if (audioSource != null && sfxFanOpen != null)
-        {
-            audioSource.PlayOneShot(sfxFanOpen);
-            Debug.Log("[ForestEventDirector] 🔊 Phát tiếng quạt PHẠCH");
-        }
-        
-        // 5. Suy nghĩ nội tâm
+        PlaySFX(sfxFanOpen);
+        Debug.Log("[ForestEventDirector] 🔊 Tiếng quạt PHẠCH");
+
         yield return new WaitForSeconds(1.5f);
-        ShowSubtitle("Chúng không đuổi theo mình... Chúng đang lùa mình về phía con đường phía trước...", 4f);
+
+        // 5. Suy nghĩ nội tâm
+        ShowSubtitle("Chúng không đuổi theo mình... Chúng đang lùa mình về phía con đường phía trước...", 4f, voiceLine5);
         yield return new WaitForSeconds(4.5f);
-        
+
         Debug.Log("[ForestEventDirector] ✅ Event 2 hoàn thành");
     }
 
     /// <summary>
-    /// SỰ KIỆN 3: Cảnh truy đuổi & Ngất (Kết thúc Gameplay)
-    /// Gọi hàm này khi người chơi đi đến gần ngôi nhà cuối đường
+    /// SỰ KIỆN 3: Cảnh truy đuổi & Ngất
     /// </summary>
     public void TriggerEvent3_TheChase()
     {
-        if (event3Triggered)
-        {
-            Debug.LogWarning("[ForestEventDirector] Event 3 đã được trigger rồi!");
-            return;
-        }
-        
-        Debug.Log("[ForestEventDirector] 🎬 Bắt đầu Event 3: Cảnh truy đuổi");
+        if (event3Triggered) return;
         StartCoroutine(PlayEvent3());
     }
 
     IEnumerator PlayEvent3()
     {
         event3Triggered = true;
-        
-        // 1. Hiện bầy hình nhân phía sau
-        if (hordeOfDolls != null)
-        {
-            hordeOfDolls.SetActive(true);
-            Debug.Log("[ForestEventDirector] 👻👻👻 Bầy hình nhân đã xuất hiện!");
-        }
-        
-        // 2. Tiếng chạy rầm rập + Tiếng hét
-        if (audioSource != null)
-        {
-            if (sfxChaseRun != null)
-            {
-                audioSource.PlayOneShot(sfxChaseRun);
-                Debug.Log("[ForestEventDirector] 🔊 Phát tiếng chạy rầm rập");
-            }
-            
-            if (sfxScream != null)
-            {
-                audioSource.PlayOneShot(sfxScream);
-                Debug.Log("[ForestEventDirector] 🔊 Phát tiếng hét");
-            }
-        }
-        
-        ShowSubtitle("ÁÁÁ!!!", 1f);
+
+        // 1. Hiện bầy hình nhân
+        if (hordeOfDolls != null) hordeOfDolls.SetActive(true);
+
+        // 2. Âm thanh hỗn loạn
+        PlaySFX(sfxChaseRun); // Tiếng chân chạy
+        PlaySFX(sfxScream);   // Tiếng hét (SFX môi trường)
+
+        // 3. Linh hét (Voice)
+        ShowSubtitle("ÁÁÁ!!!", 1f, voiceScreamEnd);
         yield return new WaitForSeconds(1.5f);
 
-        // 3. Màn hình tối dần (Fade to Black)
+        // 4. Fade to Black
         if (blackScreen != null)
         {
             blackScreen.gameObject.SetActive(true);
             float fadeDuration = 2f;
             float timer = 0;
-            
-            Debug.Log("[ForestEventDirector] 🌑 Bắt đầu fade to black...");
-            
+
             while (timer < fadeDuration)
             {
                 timer += Time.deltaTime;
@@ -265,95 +234,75 @@ public class ForestEventDirector : MonoBehaviour
                 blackScreen.color = new Color(0, 0, 0, alpha);
                 yield return null;
             }
-            
-            Debug.Log("[ForestEventDirector] ✅ Fade to black hoàn thành");
         }
 
-        // 4. Chuyển sang màn Cutscene tiếp theo hoặc Game Over
+        // 5. Chuyển Scene
         yield return new WaitForSeconds(1f);
-        
+        LoadNextScene();
+    }
+
+    void LoadNextScene()
+    {
         if (!string.IsNullOrEmpty(nextSceneName))
         {
-            Debug.Log($"[ForestEventDirector] 🚀 Chuyển sang scene: {nextSceneName}");
-            
-            // Kiểm tra scene có tồn tại không
+            // Logic kiểm tra scene an toàn
             bool sceneExists = false;
             for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
             {
                 string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
-                string sceneName = System.IO.Path.GetFileNameWithoutExtension(scenePath);
-                if (sceneName == nextSceneName)
+                if (System.IO.Path.GetFileNameWithoutExtension(scenePath) == nextSceneName)
                 {
                     sceneExists = true;
                     break;
                 }
             }
-            
-            if (sceneExists)
-            {
-                SceneManager.LoadScene(nextSceneName);
-            }
-            else
-            {
-                Debug.LogError($"[ForestEventDirector] ❌ Không tìm thấy scene '{nextSceneName}' trong Build Settings!");
-            }
-        }
-        else
-        {
-            Debug.Log("[ForestEventDirector] ℹ️ Không có scene tiếp theo được cấu hình");
+
+            if (sceneExists) SceneManager.LoadScene(nextSceneName);
+            else Debug.LogError($"[ForestEventDirector] ❌ Không tìm thấy scene '{nextSceneName}'!");
         }
     }
 
     /// <summary>
-    /// Hàm phụ trợ để hiện chữ subtitle
+    /// Hàm hiển thị Subtitle + Tự động phát Voice tương ứng
     /// </summary>
-    void ShowSubtitle(string text, float duration)
+    /// <param name="text">Nội dung chữ</param>
+    /// <param name="duration">Thời gian hiện</param>
+    /// <param name="voiceClip">File ghi âm giọng nói (có thể null)</param>
+    void ShowSubtitle(string text, float duration, AudioClip voiceClip = null)
     {
-        // Dừng subtitle cũ nếu có
-        if (currentSubtitleCoroutine != null)
-        {
-            StopCoroutine(currentSubtitleCoroutine);
-        }
-        
-        currentSubtitleCoroutine = StartCoroutine(SubtitleRoutine(text, duration));
+        if (currentSubtitleCoroutine != null) StopCoroutine(currentSubtitleCoroutine);
+        currentSubtitleCoroutine = StartCoroutine(SubtitleRoutine(text, duration, voiceClip));
     }
-
-    IEnumerator SubtitleRoutine(string text, float duration)
+    IEnumerator SubtitleRoutine(string text, float duration, AudioClip voiceClip)
     {
-        if (dialoguePanel != null)
+        // 1. Hiển thị UI
+        if (dialoguePanel != null) dialoguePanel.SetActive(true);
+        if (dialogueText != null) dialogueText.text = text;
+
+        // 2. Phát giọng nói (Nếu có)
+        if (voiceClip != null && voiceSource != null)
         {
-            dialoguePanel.SetActive(true);
+            voiceSource.Stop(); // Ngắt câu cũ ngay lập tức
+            voiceSource.loop = false; // --- QUAN TRỌNG: Đảm bảo không lặp ---
+            voiceSource.clip = voiceClip;
+            voiceSource.Play();
         }
-        
-        if (dialogueText != null)
-        {
-            dialogueText.text = text;
-            Debug.Log($"[ForestEventDirector] 💬 Subtitle: {text}");
-        }
-        
+
+        Debug.Log($"[ForestEventDirector] 💬: {text}");
+
+        // 3. Chờ hết thời gian
         yield return new WaitForSeconds(duration);
-        
-        if (dialoguePanel != null)
-        {
-            dialoguePanel.SetActive(false);
-        }
-        
+
+        // 4. Tắt UI
+        if (dialoguePanel != null) dialoguePanel.SetActive(false);
         currentSubtitleCoroutine = null;
     }
-    
-    /// <summary>
-    /// Reset tất cả events (có thể gọi từ Inspector hoặc script khác)
-    /// </summary>
+
     [ContextMenu("Reset All Events")]
     public void ResetAllEvents()
     {
         event1Triggered = false;
         event2Triggered = false;
         event3Triggered = false;
-        Debug.Log("[ForestEventDirector] Đã reset tất cả events");
     }
 }
-
-
-
-

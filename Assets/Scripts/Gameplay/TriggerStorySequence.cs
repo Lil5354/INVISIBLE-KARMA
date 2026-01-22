@@ -199,10 +199,19 @@ public class TriggerStorySequence : MonoBehaviour
 
     void NextLine()
     {
+        // --- FIX LỖI: Kiểm tra an toàn xem index cảnh có hợp lệ không ---
+        if (indexCanhHienTai >= danhSachCacCanh.Count)
+        {
+            KetThucSequence();
+            return;
+        }
+        // -------------------------------------------------------------
+
         indexThoaiHienTai++;
-        
+
         // KIỂM TRA 1: Còn thoại trong cảnh này không?
-        if (indexThoaiHienTai < danhSachCacCanh[indexCanhHienTai].loiThoai.Length)
+        if (danhSachCacCanh[indexCanhHienTai].loiThoai != null &&
+            indexThoaiHienTai < danhSachCacCanh[indexCanhHienTai].loiThoai.Length)
         {
             PhatAmThanh(indexCanhHienTai, indexThoaiHienTai);
             StartCoroutine(GoChu(danhSachCacCanh[indexCanhHienTai].loiThoai[indexThoaiHienTai]));
@@ -217,7 +226,7 @@ public class TriggerStorySequence : MonoBehaviour
     void NextScene()
     {
         indexCanhHienTai++;
-        
+
         // KIỂM TRA 2: Còn Cảnh (Ảnh) nào nữa không?
         if (indexCanhHienTai < danhSachCacCanh.Count)
         {
@@ -249,20 +258,22 @@ public class TriggerStorySequence : MonoBehaviour
 
     void KetThucSequence()
     {
-        // Ở đây chúng ta kiểm tra xem có cần chuyển scene không
-        // Nếu tên scene trống hoặc là "EndGame" thì chỉ hiện thông báo rồi dừng
+        // --- FIX LỖI: Ngắt input ngay lập tức ---
+        dangKichHoat = false;
+        // ----------------------------------------
+
         Debug.Log("[TriggerStorySequence] KẾT THÚC CỐT TRUYỆN.");
 
-        // Nếu muốn chuyển Scene thật:
-        if (!string.IsNullOrEmpty(tenSceneTiepTheo) && tenSceneTiepTheo != "Chapter2") 
+        if (!string.IsNullOrEmpty(tenSceneTiepTheo) && tenSceneTiepTheo != "Chapter2")
         {
             SceneManager.LoadScene(tenSceneTiepTheo);
         }
         else
         {
-            // Nếu là End Game -> Không làm gì cả, cứ để màn hình đen và chữ TO BE CONTINUED ở đó
-            // Có thể thêm nút "Main Menu" hoặc "Quit" ở đây nếu muốn
             Debug.Log("Dừng tại màn hình kết thúc.");
+            // Tùy chọn: Hiện lại con trỏ chuột nếu cần
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
     }
 
